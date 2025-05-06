@@ -30,7 +30,7 @@ const DashboardLayout: React.FC<Props> = ({ role }) => {
       <aside className="sidebar">
         <h2>{role.charAt(0).toUpperCase() + role.slice(1)} Panel</h2>
         <nav>
-          {links[role].map(link => (
+          {links[role].map((link) => (
             <NavLink
               key={link.to}
               to={link.to}

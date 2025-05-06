@@ -15,6 +15,7 @@ import { PatientDashboard } from './pages/patient/Dashboard';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { SignupPage } from './pages/SignupPage';
 import { NotFound } from './pages/NotFound';
+import { DoctorDashboard } from './pages/doctor/Dashboard';
 
 function App() {
   const getUser = () => {
@@ -60,6 +61,7 @@ function App() {
           </ProtectedRoute>
         }
       >
+        <Route path="dashboard" element={<DoctorDashboard />} />
         <Route path="patients" element={<Patients />} />
         <Route path="schedule" element={<Schedule />} />
       </Route>
@@ -77,7 +79,7 @@ function App() {
       </Route>
 
       <Route path="*" element={<NotFound />} />
-      </Routes>
+    </Routes>
   );
 }
 
