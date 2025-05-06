@@ -9,10 +9,12 @@ import Schedule from './pages/doctor/Schedule';
 
 import PatientLayout from './pages/patient/PatientLayout';
 import Appointments from './pages/patient/Appointments';
-import { Login } from './pages/Login';
+import { LoginPage } from './pages/Login';
 import { AdminLayout } from './pages/admin/AdminLayout';
 import { PatientDashboard } from './pages/patient/Dashboard';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { SignupPage } from './pages/SignupPage';
+import { NotFound } from './pages/NotFound';
 
 function App() {
   const getUser = () => {
@@ -35,7 +37,8 @@ function App() {
         }
       />
 
-      <Route path="/login" element={<Login />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/signup" element={<SignupPage />} />
 
       <Route
         path="/admin"
@@ -73,8 +76,8 @@ function App() {
         <Route path="appointments" element={<Appointments />} />
       </Route>
 
-      <Route path="*" element={<h1>404 Page Not Found</h1>} />
-    </Routes>
+      <Route path="*" element={<NotFound />} />
+      </Routes>
   );
 }
 

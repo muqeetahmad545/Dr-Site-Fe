@@ -1,9 +1,7 @@
-import React from 'react'
+import DashboardLayout from '../../components/DashboardLayout';
 
 const DoctorLayout = () => {
-  return (
-    <div>DoctorLayout</div>
-  )
-}
+  return <DashboardLayout role="doctor" />;
+};
 
-export default DoctorLayout
+export default DoctorLayout;

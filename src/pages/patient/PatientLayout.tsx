@@ -1,9 +1,9 @@
 import React from 'react'
+import DashboardLayout from '../../components/DashboardLayout';
 
 const PatientLayout = () => {
-  return (
-    <div>PatientLayout</div>
-  )
+  return <DashboardLayout role="patient" />;
+
 }
 
 export default PatientLayout
