@@ -23,19 +23,28 @@ a:hover {
 }
 
 body {
-  width: 100% !important;
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
+  /* display: flex; */
+  /* place-items: center; */
+  /* min-width: 320px; */
   min-height: 100vh;
 }
 
 h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+  color: var(--color-primary);
+  /* font-size: 3.2em; */
+  /* line-height: 1.1; */
 }
 
+h1:hover {
+  color: var(--color-success);
+  color: var(--color-primaryHover);
+}
+
+h1.active {
+  color: var(--color-primaryHover);
+  font-weight: bold;
+}
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -54,6 +63,18 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
+
+.link {
+  color: var(--color-success);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.link:hover {
+  text-decoration: underline;
+  color: var(--color-primaryHover); 
+}
+
 
 @media (prefers-color-scheme: light) {
   :root {

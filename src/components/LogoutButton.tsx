@@ -1,4 +1,5 @@
 import { Button } from 'antd';
+import { LogoutOutlined } from '@ant-design/icons'; 
 import { useNavigate } from 'react-router-dom';
 import { COLORS } from '../constants/theme';
 
@@ -13,6 +14,7 @@ export const LogoutButton = () => {
   return (
     <Button
       danger
+      icon={<LogoutOutlined />}
       onClick={handleLogout}
       style={{
         backgroundColor: COLORS.danger,
@@ -24,6 +26,7 @@ export const LogoutButton = () => {
       onMouseEnter={(e) => {
         (e.currentTarget as HTMLElement).style.backgroundColor = '#cc393d';
         (e.currentTarget as HTMLElement).style.borderColor = '#cc393d';
+
       }}
       onMouseLeave={(e) => {
         (e.currentTarget as HTMLElement).style.backgroundColor = COLORS.danger;

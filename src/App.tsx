@@ -13,10 +13,13 @@ import { LoginPage } from './pages/Login';
 import { AdminLayout } from './pages/admin/AdminLayout';
 import { PatientDashboard } from './pages/patient/Dashboard';
 import { ProtectedRoute } from './components/ProtectedRoute';
-import { SignupPage } from './pages/SignupPage';
+import { SignupPage } from './pages/Signup';
 import { NotFound } from './pages/NotFound';
-import { DoctorDashboard } from './pages/doctor/Dashboard';
-
+import { COLORS } from './constants/theme';
+import { ForgetPassword } from './pages/ForgetPassword';
+import UserManagement from './pages/admin/UserManagement';
+import HealthOverview from './pages/patient/HealthOverview';
+import DoctorDashboard from './pages/doctor/Dashboard';
 function App() {
   const getUser = () => {
     const user = localStorage.getItem('user');
@@ -24,6 +27,20 @@ function App() {
   };
 
   const user = getUser();
+
+
+const root = document.documentElement;
+
+root.style.setProperty('--color-primary', COLORS.primary);
+root.style.setProperty('--color-primaryHover', COLORS.primaryHover);
+root.style.setProperty('--color-secondary', COLORS.secondary);
+root.style.setProperty('--color-danger', COLORS.danger);
+root.style.setProperty('--color-success', COLORS.success);
+root.style.setProperty('--color-white', COLORS.white);
+
+// root.style.setProperty('--padding', SIZES.padding);
+// root.style.setProperty('--border-radius', `${SIZES.borderRadius}px`);
+
 
   return (
     <Routes>
@@ -40,6 +57,7 @@ function App() {
 
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
+      <Route path="/forgetPassword" element={<ForgetPassword />} />
 
       <Route
         path="/admin"
@@ -50,6 +68,7 @@ function App() {
         }
       >
         <Route path="dashboard" element={<AdminDashboard />} />
+        <Route path="userManagement" element={<UserManagement />} />
         <Route path="settings" element={<AdminSettings />} />
       </Route>
 
@@ -76,6 +95,7 @@ function App() {
       >
         <Route path="dashboard" element={<PatientDashboard />} />
         <Route path="appointments" element={<Appointments />} />
+        <Route path="healthOverview" element={<HealthOverview />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />

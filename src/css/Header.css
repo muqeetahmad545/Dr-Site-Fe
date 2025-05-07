@@ -1,0 +1,8 @@
+/* src/css/Header.css */
+.app-header {
+    background-color: transparent;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #ddd;
+    margin-left: 40px;
+  }
+  

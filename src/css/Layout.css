@@ -1,20 +1,27 @@
 /* src/components/DashboardLayout.css */
 .dashboard-layout {
+  /* text-align: center; */
   display: flex;
   height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .sidebar {
   width: 240px;
-  background-color: #2c3e50;
+  background-color: var(--color-primary);
   color: white;
   padding: 20px;
   display: flex;
   flex-direction: column;
 }
-
+.panel-title{
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
 .sidebar h2 {
   margin-bottom: 20px;
+  font-size: 1.25rem;
+  color: white;
 }
 
 .nav-link {
@@ -23,20 +30,60 @@
   padding: 10px;
   margin-bottom: 10px;
   border-radius: 4px;
-  display: block;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .nav-link:hover {
-  background-color: #34495e;
+  color: var(--color-success);
+  background-color: var(--color-primaryHover);
 }
 
 .nav-link.active {
-  background-color: #2980b9;
+  background-color: var(--color-primaryHover);
+  font-weight: bold;
+}
+
+.nav-link .icon {
+  margin-right: 10px;
+  font-size: 18px;
 }
 
 .content {
+  color: black;
   flex: 1;
-  padding: 20px;
+  padding: 10px;
   background-color: #f4f4f4;
   overflow-y: auto;
+}
+
+.logout-container {
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .dashboard-layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    padding: 10px;
+  }
+
+  .nav-link {
+    margin: 5px;
+    flex: 1 1 40%;
+    justify-content: center;
+  }
+
+  .content {
+    padding: 15px;
+  }
 }

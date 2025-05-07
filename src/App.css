@@ -5,6 +5,10 @@
   text-align: center;
 }
 
+.pie-chart{
+  color: black;
+  background-color: black;
+}
 .logo {
   height: 6em;
   padding: 1.5em;

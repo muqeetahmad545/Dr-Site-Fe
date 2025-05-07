@@ -37,7 +37,7 @@ export const SignupPage = () => {
         </Title>
         <Form layout="vertical" form={form} onFinish={handleSignup}>
           <Form.Item
-            label="Email"
+            label="Email Address"
             name="email"
             rules={[{ required: true }]}
           >
@@ -75,7 +75,7 @@ export const SignupPage = () => {
             </PrimaryButton>
           </Form.Item>
           <div style={{ textAlign: "center" }}>
-            Already have an account? <Link to="/login">Login</Link>
+            Already have an account? <Link className="link" to="/login">Login</Link>
           </div>
         </Form>
       </Card>
