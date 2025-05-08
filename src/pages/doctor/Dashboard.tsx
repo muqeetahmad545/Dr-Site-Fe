@@ -13,7 +13,7 @@ const DoctorDashboard = () => {
   ];
 
   return (
-    <div style={{ padding: '24px' }}>
+    <div >
       <Row gutter={16} style={{ marginBottom: '24px' }}>
         <Col span={8}>
           <Card>

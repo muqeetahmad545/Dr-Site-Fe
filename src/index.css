@@ -1,7 +1,7 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Roboto', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
-  font-weight: 400;
+  font-weight: 600;
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
@@ -28,6 +28,7 @@ body {
   /* place-items: center; */
   /* min-width: 320px; */
   min-height: 100vh;
+  
 }
 
 h1 {
@@ -74,8 +75,11 @@ button:focus-visible {
   text-decoration: underline;
   color: var(--color-primaryHover); 
 }
-
-
+.titel-button .header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

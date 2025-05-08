@@ -1,6 +1,6 @@
 // src/pages/doctor/Patients.tsx
 
-import { Table, Button, Typography } from 'antd';
+import { Table, Button, Typography, Card } from 'antd';
 
 const { Title } = Typography;
 
@@ -29,9 +29,9 @@ const columns = [
 
 const Patients = () => {
   return (
-    <div style={{ padding: '24px' }}>
-      <Table columns={columns} dataSource={patientList} rowKey="id" />
-    </div>
+    <Card title="Patients">
+     <Table columns={columns} dataSource={patientList} rowKey="id" />
+    </Card>
   );
 };
 

@@ -17,7 +17,7 @@ const patientData = {
 
 export const PatientDashboard = () => {
   return (
-    <div style={{ padding: '20px' }}>
+    <div>
       <Row gutter={16}>
         {/* Patient Info Card */}
         <Col span={8}>

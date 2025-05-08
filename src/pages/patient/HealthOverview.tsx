@@ -11,7 +11,7 @@ const HealthOverview = () => {
   };
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div>
       <Row gutter={16}>
         <Col span={8}>
           <Card title="BMI">

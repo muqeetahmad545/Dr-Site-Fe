@@ -2,8 +2,6 @@
 
 import React, { useState } from "react";
 import {
-  Button,
-  Table,
   Modal,
   Form,
   Input,
@@ -77,38 +75,11 @@ const Appointments = () => {
       description: `You have cancelled your appointment with id: ${id}.`,
     });
   };
-
-  const columns = [
-    {
-      title: "Doctor",
-      dataIndex: "doctor",
-      key: "doctor",
-    },
-    {
-      title: "Date",
-      dataIndex: "date",
-      key: "date",
-    },
-    {
-      title: "Time",
-      dataIndex: "time",
-      key: "time",
-    },
-    {
-      title: "Action",
-      key: "action",
-      render: (_, record: any) => (
-        <Button type="link" onClick={() => handleCancelAppointment(record.id)}>
-          Cancel
-        </Button>
-      ),
-    },
-  ];
-
   const doctors = [
     {
       id: 1,
       name: "Dr. Smith",
+      experience: "16 Years Experience Overall",
       image: DrSmithImg,
       description: "Work and Student Sickness Certificate",
       price: "€45.99",
@@ -116,6 +87,7 @@ const Appointments = () => {
     {
       id: 2,
       name: "Dr. Johnson",
+      experience: "16 Years Experience Overall",
       image: DrSmithImg,
       description: "Work and Student Sickness Certificate",
       price: "€45.99",
@@ -123,6 +95,7 @@ const Appointments = () => {
     {
       id: 3,
       name: "Dr. Lee",
+      experience: "16 Years Experience Overall",
       image: DrSmithImg,
       description: "Work and Student Sickness Certificate",
       price: "€45.99",
@@ -130,13 +103,17 @@ const Appointments = () => {
   ];
 
   return (
-    <div style={{ padding: 24, paddingTop: 0 }}>
-      <Title className="titel" level={3}>Doctor Letters & Sick Notes</Title>
+    <div>
+      <Title className="titel" level={3}>
+        Doctor Letters & Sick Notes
+      </Title>
       <Paragraph className="titel">
         Same-day letters, sick notes, medical certificates and referral letters.
       </Paragraph>
-      <div style={{ marginTop:40, marginBottom: 40 }}>
-        <Title className="titel" level={4}>Terms & Conditions – Certificates Consultation</Title>
+      <div style={{ marginTop: 40, marginBottom: 40 }}>
+        <Title className="titel" level={4}>
+          Terms & Conditions – Certificates Consultation
+        </Title>
         <Paragraph>
           <strong>Doctor’s Discretion:</strong> All certificates are issued at
           the discretion of the doctor after a consultation with the patient.
@@ -204,6 +181,9 @@ const Appointments = () => {
                 title={doctor.description}
                 description={doctor.price}
               />
+              <Paragraph style={{ textAlign: "center", marginTop: 8 }}>
+                {doctor.experience}
+              </Paragraph>
             </Card>
           </Col>
         ))}

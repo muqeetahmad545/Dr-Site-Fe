@@ -11,7 +11,7 @@ export const CenteredLayout = ({ children, maxWidth = 480 }: CenteredLayoutProps
     <div
       style={{
         height: '100vh',
-        width: '100vw',
+        // width: '100vw',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',

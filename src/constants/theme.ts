@@ -10,7 +10,10 @@ export const COLORS = {
     success: '#45b36b',         
     textPrimary: '#1a1a1a',      
     textSecondary: '#595959',    
-    mutedGray: '#d9d9d9',  
+    mutedGray: '#d9d9d9',
+    
+    gradientPrimary: 'linear-gradient(90deg, rgb(90, 172, 78), rgba(74, 144, 226, 0.9))',
+  
   };
   
   export const SIZES = {

@@ -17,9 +17,12 @@ import { SignupPage } from './pages/Signup';
 import { NotFound } from './pages/NotFound';
 import { COLORS } from './constants/theme';
 import { ForgetPassword } from './pages/ForgetPassword';
-import UserManagement from './pages/admin/UserManagement';
 import HealthOverview from './pages/patient/HealthOverview';
 import DoctorDashboard from './pages/doctor/Dashboard';
+import AllDoctors from './pages/admin/Doctors';
+import AllPatients from './pages/admin/Patients';
+import AppointmentsList from './pages/admin/AllAppointments';
+import AllAppointments from './pages/admin/AllAppointments';
 function App() {
   const getUser = () => {
     const user = localStorage.getItem('user');
@@ -37,6 +40,7 @@ root.style.setProperty('--color-secondary', COLORS.secondary);
 root.style.setProperty('--color-danger', COLORS.danger);
 root.style.setProperty('--color-success', COLORS.success);
 root.style.setProperty('--color-white', COLORS.white);
+root.style.setProperty('--gradient-primary', COLORS.gradientPrimary);
 
 // root.style.setProperty('--padding', SIZES.padding);
 // root.style.setProperty('--border-radius', `${SIZES.borderRadius}px`);
@@ -68,7 +72,9 @@ root.style.setProperty('--color-white', COLORS.white);
         }
       >
         <Route path="dashboard" element={<AdminDashboard />} />
-        <Route path="userManagement" element={<UserManagement />} />
+        <Route path="doctors" element={<AllDoctors />} />
+        <Route path="patients" element={<AllPatients />} />
+        <Route path="all-appointments" element={<AllAppointments />} />
         <Route path="settings" element={<AdminSettings />} />
       </Route>
 
@@ -81,7 +87,7 @@ root.style.setProperty('--color-white', COLORS.white);
         }
       >
         <Route path="dashboard" element={<DoctorDashboard />} />
-        <Route path="patients" element={<Patients />} />
+        <Route path="patient" element={<Patients />} />
         <Route path="schedule" element={<Schedule />} />
       </Route>
 

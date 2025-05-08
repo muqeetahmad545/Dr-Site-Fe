@@ -75,6 +75,9 @@ export const LoginPage = () => {
         <Title level={3} style={{ textAlign: "center" }}>
           Login
         </Title>
+        <p style={{ textAlign: "center" }}>
+          <strong>Welcome to Cliniva</strong>
+        </p>
         <Form layout="vertical" onFinish={handleLogin}>
           <Form.Item
             label="Email Address"
@@ -95,7 +98,11 @@ export const LoginPage = () => {
             />
           </Form.Item>
           <div style={{ textAlign: "right", marginBottom: "1rem" }}>
-            <Link className="link" to="/forgetPassword" style={{ fontSize: "0.9rem"}}>
+            <Link
+              className="link"
+              to="/forgetPassword"
+              style={{ fontSize: "0.9rem" }}
+            >
               Forgot password?
             </Link>
           </div>
@@ -109,7 +116,7 @@ export const LoginPage = () => {
           Or continue with
         </div>
         <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
-          <Button  icon={<GoogleOutlined />} block onClick={loginWithGoogle}>
+          <Button icon={<GoogleOutlined />} block onClick={loginWithGoogle}>
             Google
           </Button>
           <Button
@@ -123,7 +130,10 @@ export const LoginPage = () => {
         </div>
 
         <div style={{ textAlign: "center", marginTop: 24 }}>
-          Don't have an account? <Link className="link" to="/signup">Sign up</Link>
+          Don't have an account?{" "}
+          <Link className="link" to="/signup">
+            Sign up
+          </Link>
         </div>
       </Card>
     </AuthLayout>

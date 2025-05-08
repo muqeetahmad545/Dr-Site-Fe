@@ -24,7 +24,7 @@ export const PrimaryButton = ({
       htmlType={htmlType}
       block={block}
       style={{
-        backgroundColor: COLORS.primary,
+        backgroundImage: COLORS.gradientPrimary,
         borderColor: COLORS.primary,
         ...style,
       }}

@@ -1,4 +1,4 @@
-import { Calendar, Badge } from 'antd';
+import { Calendar, Badge, Card } from 'antd';
 const getListData = (value: any) => {
   const date = value.date();
   switch (date) {
@@ -28,9 +28,9 @@ const dateCellRender = (value: any) => {
 
 const Schedule = () => {
   return (
-    <div style={{ padding: '24px' }}>
-      <Calendar dateCellRender={dateCellRender} />
-    </div>
+    <Card title="Schedule">
+<Calendar dateCellRender={dateCellRender} />
+    </Card>
   );
 };
 
