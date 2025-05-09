@@ -8,6 +8,7 @@ interface PrimaryButtonProps {
   style?: CSSProperties;
   htmlType?: 'button' | 'submit' | 'reset';
   block?: boolean;
+  loading?: boolean;
 }
 
 export const PrimaryButton = ({

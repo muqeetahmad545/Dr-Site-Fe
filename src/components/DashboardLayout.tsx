@@ -16,15 +16,10 @@ import { Avatar } from "antd";
 import { Header } from "./Header";
 import { LogoutButton } from "./LogoutButton";
 import logo from "../assets/logo.png";
+import type { User } from "../types/user";
 
 interface Props {
   role: "admin" | "doctor" | "patient";
-}
-
-interface User {
-  name: string;
-  role: string;
-  image?: string;
 }
 
 interface NavLinkItem {

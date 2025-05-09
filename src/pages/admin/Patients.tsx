@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { Table, Tag, Card } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { PrimaryButton } from "../../components/PrimaryButton";
 
-const users = [
+const patient = [
   {
     id: 1,
     name: "John Doe",
@@ -25,6 +25,12 @@ const users = [
 ];
 
 const AllPatients: React.FC = () => {
+  const [patientList,setPatientList]= useState(patient)
+
+  const handleDelete = (id:any)=>{
+    const updatedList = patientList.filter((patient)=>patient.id !== id)
+    setPatientList(updatedList);
+  }
   const columns = [
     { title: "Name", dataIndex: "name" },
     { title: "Address", dataIndex: "address" },
@@ -43,10 +49,10 @@ const AllPatients: React.FC = () => {
     },
     {
       title: "Actions",
-      render: () => (
+      render: (_: any, record: any) => (
         <>
           <EditOutlined style={{ marginRight: 16, color: "#1890ff" }} />
-          <DeleteOutlined style={{ color: "#ff4d4f" }} />
+          <DeleteOutlined  onClick={()=>handleDelete (record.id)}style={{ color: "#ff4d4f" }} />
         </>
       ),
     },
@@ -60,9 +66,10 @@ const AllPatients: React.FC = () => {
           <span>Patients</span>
           <PrimaryButton>Add Patient</PrimaryButton>
         </div>
+
       }
     >
-      <Table dataSource={users} columns={columns} rowKey="id" />
+      <Table dataSource={patientList} columns={columns} rowKey="id" />
     </Card>
   );
 };

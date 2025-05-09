@@ -6,7 +6,6 @@ import { signInWithPopup } from "firebase/auth";
 import { GoogleOutlined, FacebookFilled } from "@ant-design/icons";
 import { auth, facebookProvider, googleProvider } from "../firebase";
 import { PrimaryButton } from "../components/PrimaryButton";
-import { COLORS } from "../constants/theme";
 
 const { Title } = Typography;
 

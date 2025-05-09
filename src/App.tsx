@@ -21,8 +21,8 @@ import HealthOverview from './pages/patient/HealthOverview';
 import DoctorDashboard from './pages/doctor/Dashboard';
 import AllDoctors from './pages/admin/Doctors';
 import AllPatients from './pages/admin/Patients';
-import AppointmentsList from './pages/admin/AllAppointments';
 import AllAppointments from './pages/admin/AllAppointments';
+import AddDoctor from './pages/admin/AddDoctor';
 function App() {
   const getUser = () => {
     const user = localStorage.getItem('user');
@@ -75,6 +75,8 @@ root.style.setProperty('--gradient-primary', COLORS.gradientPrimary);
         <Route path="doctors" element={<AllDoctors />} />
         <Route path="patients" element={<AllPatients />} />
         <Route path="all-appointments" element={<AllAppointments />} />
+        <Route path="add-doctor" element={<AddDoctor />} />
+        <Route path="edit-doctor/:id" element={<AddDoctor />} />
         <Route path="settings" element={<AdminSettings />} />
       </Route>
 

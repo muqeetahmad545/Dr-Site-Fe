@@ -1,30 +1,42 @@
 import React from "react";
-import { Table, Tag, Card } from "antd";
+import { Table, Tag, Card, message } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { PrimaryButton } from "../../components/PrimaryButton";
+import { useNavigate } from "react-router-dom";
 
-const users = [
+const doctor = [
   {
     id: 1,
     name: "John Doe",
-    role: "Doctor",
+    gender: "Male",
+    phone: '+923031411121',
     email: "john@drsite.com",
     active: true,
   },
   {
     id: 2,
     name: "Jane Smith",
-    role: "Doctor",
+    gender: "Female",
+    phone: '+923031411122',
     email: "jane@drsite.com",
     active: false,
   },
 ];
 
 const AllDoctors: React.FC = () => {
+  const navigate = useNavigate();
+  const [doctorList, setDoctorList] = React.useState(doctor);
+  const handleDelete = (id: any) => {
+    const updatedList = doctorList.filter((doc) => doc.id !== id);
+    setDoctorList(updatedList);
+    message.success("Doctor deleted successfully!");
+  };
+  
   const columns = [
     { title: "Name", dataIndex: "name" },
     { title: "Email", dataIndex: "email" },
-    { title: "Role", dataIndex: "role" },
+    { title: "Gender", dataIndex: "gender" },
+    { title: "Phone", dataIndex: "phone" },
     {
       title: "Status",
       dataIndex: "active",
@@ -37,10 +49,13 @@ const AllDoctors: React.FC = () => {
     },
     {
       title: "Actions",
-      render: () => (
+      render: (_: any, record: any) => (
         <>
-          <EditOutlined style={{ marginRight: 16, color: "#1890ff" }} />
-          <DeleteOutlined style={{ color: "#ff4d4f" }} />
+          <EditOutlined
+            onClick={() => navigate(`/admin/edit-doctor/${record.id}`)}
+            style={{ marginRight: 16, color: "#1890ff", cursor: "pointer" }}
+          />
+          <DeleteOutlined onClick={() => handleDelete(record.id)} style={{ color: "#ff4d4f", cursor: "pointer" }} />
         </>
       ),
     },
@@ -52,11 +67,13 @@ const AllDoctors: React.FC = () => {
       title={
         <div className="header-row">
           <span>Doctors</span>
-          <PrimaryButton>Add Doctor</PrimaryButton>
+          <PrimaryButton onClick={() => navigate("/admin/add-doctor")}>
+            Add Doctor
+          </PrimaryButton>
         </div>
       }
     >
-      <Table dataSource={users} columns={columns} rowKey="id" />
+      <Table dataSource={doctorList} columns={columns} rowKey="id" />
     </Card>
   );
 };

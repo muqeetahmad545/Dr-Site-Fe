@@ -1,5 +1,4 @@
 // Example: Patient Health Overview Page (Professional UI)
-import React from 'react';
 import { Card, Col, Row, Statistic, Progress } from 'antd';
 
 const HealthOverview = () => {

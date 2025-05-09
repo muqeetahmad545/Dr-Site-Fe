@@ -1,6 +1,6 @@
 // src/pages/patient/Appointments.tsx
 
-import React, { useState } from "react";
+import  { useState } from "react";
 import {
   Modal,
   Form,
@@ -66,15 +66,15 @@ const Appointments = () => {
     setIsModalVisible(false);
   };
 
-  const handleCancelAppointment = (id: number) => {
-    setAppointments(
-      appointments.filter((appointment) => appointment.id !== id)
-    );
-    notification.success({
-      message: "Appointment Cancelled",
-      description: `You have cancelled your appointment with id: ${id}.`,
-    });
-  };
+  // const handleCancelAppointment = (id: number) => {
+  //   setAppointments(
+  //     appointments.filter((appointment) => appointment.id !== id)
+  //   );
+  //   notification.success({
+  //     message: "Appointment Cancelled",
+  //     description: `You have cancelled your appointment with id: ${id}.`,
+  //   });
+  // };
   const doctors = [
     {
       id: 1,

@@ -1,0 +1,9 @@
+  export interface Doctor {
+    name: string;
+    email: string;
+    phoneNumber: string;
+    address?: string;
+    gender?: string;
+    specialization?: string;
+    pastExperience?: string;
+  }

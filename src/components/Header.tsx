@@ -3,15 +3,10 @@ import "../css/Header.css";
 import { UserOutlined } from "@ant-design/icons";
 import { Avatar, Dropdown } from "antd";
 import { LogoutButton } from "./LogoutButton";
+import type { User } from "../types/user";
 
 interface HeaderProps {
   title?: string;
-}
-
-interface User {
-  email: string;
-  role: string;
-  name: string;
 }
 
 export const Header: React.FC<HeaderProps> = ({ title = "Dr Site" }) => {
