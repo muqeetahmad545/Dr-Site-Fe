@@ -69,6 +69,7 @@ const AdminSetting: React.FC = () => {
         </div>
       </div>
 
+
       <Form layout="vertical" onFinish={handleFinish} form={form}>
         <Form.Item label="Name" name="name" rules={[{ required: true }]}>
           <Input />
