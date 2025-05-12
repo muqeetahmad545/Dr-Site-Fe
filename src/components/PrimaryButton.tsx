@@ -1,22 +1,25 @@
-import { Button } from 'antd';
-import { COLORS } from '../constants/theme';
-import type { CSSProperties } from 'react';
+import { Button } from "antd";
+import { COLORS } from "../constants/theme";
+import type { CSSProperties, ReactNode } from "react";
 
 interface PrimaryButtonProps {
-  children: React.ReactNode;
+  children: ReactNode;
   onClick?: () => void;
   style?: CSSProperties;
-  htmlType?: 'button' | 'submit' | 'reset';
+  htmlType?: "button" | "submit" | "reset";
   block?: boolean;
   loading?: boolean;
+  icon?: ReactNode; 
 }
 
 export const PrimaryButton = ({
   children,
   onClick,
   style,
-  htmlType = 'button',
+  htmlType = "button",
   block = false,
+  loading = false,
+  icon, 
 }: PrimaryButtonProps) => {
   return (
     <Button
@@ -24,18 +27,22 @@ export const PrimaryButton = ({
       onClick={onClick}
       htmlType={htmlType}
       block={block}
+      icon={icon} 
+      loading={loading}
       style={{
         backgroundImage: COLORS.gradientPrimary,
         borderColor: COLORS.primary,
         ...style,
       }}
       onMouseEnter={(e) => {
-        (e.currentTarget as HTMLElement).style.backgroundColor = COLORS.primaryHover;
-        (e.currentTarget as HTMLElement).style.borderColor = COLORS.primaryHover;
+        const btn = e.currentTarget as HTMLElement;
+        btn.style.backgroundColor = COLORS.primaryHover;
+        btn.style.borderColor = COLORS.primaryHover;
       }}
       onMouseLeave={(e) => {
-        (e.currentTarget as HTMLElement).style.backgroundColor = COLORS.primary;
-        (e.currentTarget as HTMLElement).style.borderColor = COLORS.primary;
+        const btn = e.currentTarget as HTMLElement;
+        btn.style.backgroundColor = COLORS.primary;
+        btn.style.borderColor = COLORS.primary;
       }}
     >
       {children}

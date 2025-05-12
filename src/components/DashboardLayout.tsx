@@ -84,11 +84,14 @@ export const DashboardLayout: React.FC<Props> = ({ role }) => {
       { to: "dashboard", label: "Dashboard", icon: <DashboardOutlined /> },
       { to: "patient", label: "Patient", icon: <TeamOutlined /> },
       { to: "schedule", label: "Schedule", icon: <CalendarOutlined /> },
+      { to: "settings", label: "Settings", icon: <SettingOutlined /> },
     ],
     patient: [
       { to: "dashboard", label: "Dashboard", icon: <DashboardOutlined /> },
       { to: "healthOverview", label: "Health Overview", icon: <MedicineBoxOutlined /> },
       { to: "appointments", label: "Appointments", icon: <ProfileOutlined /> },
+      { to: "settings", label: "Settings", icon: <SettingOutlined /> },
+
     ],
   };
 

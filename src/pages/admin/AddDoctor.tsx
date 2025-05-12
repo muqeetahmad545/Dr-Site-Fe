@@ -69,6 +69,14 @@ const AddDoctor: React.FC = () => {
           <Input />
         </Form.Item>
 
+        <Form.Item
+          label="Password"
+          name="password"
+          rules={[{ required: true }]}
+        >
+          <Input.Password />
+        </Form.Item>
+
         <Form.Item label="Address" name="address">
           <Input />
         </Form.Item>
@@ -89,7 +97,7 @@ const AddDoctor: React.FC = () => {
         </Form.Item>
 
         <Form.Item label="Past Experience" name="pastExperience">
-          <Input />
+          <Input.TextArea rows={5} />
         </Form.Item>
 
         <Form.Item>

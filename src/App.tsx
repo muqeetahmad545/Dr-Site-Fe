@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 import AdminDashboard from './pages/admin/Dashboard';
-import AdminSettings from './pages/admin/Settings';
+import AdminSetting from './pages/admin/Settings';
 
 import DoctorLayout from './pages/doctor/DoctorLayout';
 import Patients from './pages/doctor/Patients';
@@ -23,6 +23,10 @@ import AllDoctors from './pages/admin/Doctors';
 import AllPatients from './pages/admin/Patients';
 import AllAppointments from './pages/admin/AllAppointments';
 import AddDoctor from './pages/admin/AddDoctor';
+import AddPatient from './pages/admin/AddPatient';
+import AddAppointment from './pages/admin/AddAppointment';
+import PatientSetting from './pages/patient/Settings';
+import DoctorSetting from './pages/doctor/Settings';
 function App() {
   const getUser = () => {
     const user = localStorage.getItem('user');
@@ -77,7 +81,11 @@ root.style.setProperty('--gradient-primary', COLORS.gradientPrimary);
         <Route path="all-appointments" element={<AllAppointments />} />
         <Route path="add-doctor" element={<AddDoctor />} />
         <Route path="edit-doctor/:id" element={<AddDoctor />} />
-        <Route path="settings" element={<AdminSettings />} />
+        <Route path="add-patient" element={<AddPatient />} />
+        <Route path="edit-patient/:id" element={<AddPatient />} /> 
+        <Route path="add-appointment" element={<AddAppointment />} />
+        <Route path="edit-appointment/:id" element={<AddAppointment />} />
+        <Route path="settings" element={<AdminSetting />} />
       </Route>
 
       <Route
@@ -91,6 +99,7 @@ root.style.setProperty('--gradient-primary', COLORS.gradientPrimary);
         <Route path="dashboard" element={<DoctorDashboard />} />
         <Route path="patient" element={<Patients />} />
         <Route path="schedule" element={<Schedule />} />
+        <Route path="settings" element={<DoctorSetting />} />
       </Route>
 
       <Route
@@ -104,6 +113,7 @@ root.style.setProperty('--gradient-primary', COLORS.gradientPrimary);
         <Route path="dashboard" element={<PatientDashboard />} />
         <Route path="appointments" element={<Appointments />} />
         <Route path="healthOverview" element={<HealthOverview />} />
+        <Route path="settings" element={<PatientSetting />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />

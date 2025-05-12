@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Table, Tag, Card } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { PrimaryButton } from "../../components/PrimaryButton";
+import { useNavigate } from "react-router-dom";
 
 const patient = [
   {
@@ -26,6 +27,15 @@ const patient = [
 
 const AllPatients: React.FC = () => {
   const [patientList,setPatientList]= useState(patient)
+  const navigate= useNavigate()
+  
+  const handelAddPatient=()=>{
+    navigate('/admin/add-patient')
+  }
+
+  const handelEditPatient = ( id :any)=>{
+    navigate(`/admin/edit-patient/${id}`)
+  }
 
   const handleDelete = (id:any)=>{
     const updatedList = patientList.filter((patient)=>patient.id !== id)
@@ -51,7 +61,7 @@ const AllPatients: React.FC = () => {
       title: "Actions",
       render: (_: any, record: any) => (
         <>
-          <EditOutlined style={{ marginRight: 16, color: "#1890ff" }} />
+          <EditOutlined onClick = {()=>handelEditPatient (record.id)}style={{ marginRight: 16, color: "#1890ff" }} />
           <DeleteOutlined  onClick={()=>handleDelete (record.id)}style={{ color: "#ff4d4f" }} />
         </>
       ),
@@ -64,7 +74,7 @@ const AllPatients: React.FC = () => {
       title={
         <div className="header-row">
           <span>Patients</span>
-          <PrimaryButton>Add Patient</PrimaryButton>
+          <PrimaryButton onClick={()=>handelAddPatient()}>Add Patient</PrimaryButton>
         </div>
 
       }

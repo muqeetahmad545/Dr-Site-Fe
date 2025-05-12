@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { Table, Tag, Card } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { PrimaryButton } from "../../components/PrimaryButton";
+import { useNavigate } from "react-router-dom";
 
-const users = [
+const appointmentsData  = [
   {
     id: 1,
     pattientName: "John Doe",
@@ -25,6 +26,21 @@ const users = [
 ];
 
 const AllAppointments: React.FC = () => {
+const [appointmentsList, setAppointmentList] = useState(appointmentsData);
+const navigate= useNavigate()
+
+    const handelDeleteAppointment = (id:any)=>{
+    const updatedList = appointmentsList.filter((appointment)=>appointment.id !== id)
+    setAppointmentList(updatedList);
+  }
+
+    const handelAddAppointment=()=>{
+    navigate('/admin/add-appointment')
+  }
+
+  const handelEditAppointment = ( id :any)=>{
+    navigate(`/admin/edit-appointment/${id}`)
+  }
   const columns = [
     { title: "Pattient Name", dataIndex: "pattientName" },
     { title: "Age", dataIndex: "age" },
@@ -43,10 +59,10 @@ const AllAppointments: React.FC = () => {
     },
     {
       title: "Actions",
-      render: () => (
+      render: (_: any, record: any) => (
         <>
-          <EditOutlined style={{ marginRight: 16, color: "#1890ff" }} />
-          <DeleteOutlined style={{ color: "#ff4d4f" }} />
+          <EditOutlined onClick={()=>handelEditAppointment(record.id)} style={{ marginRight: 16, color: "#1890ff" }} />
+          <DeleteOutlined onClick={()=>handelDeleteAppointment(record.id)}style={{ color: "#ff4d4f" }} />
         </>
       ),
     },
@@ -58,11 +74,11 @@ const AllAppointments: React.FC = () => {
       title={
         <div className="header-row">
           <span>Appointments</span>
-          <PrimaryButton>Add Appointment</PrimaryButton>
+          <PrimaryButton onClick={()=>handelAddAppointment()} >Add Appointment</PrimaryButton>
         </div>
       }
     >
-      <Table dataSource={users} columns={columns} rowKey="id" />
+      <Table dataSource={appointmentsList} columns={columns} rowKey="id" />
     </Card>
   );
 };

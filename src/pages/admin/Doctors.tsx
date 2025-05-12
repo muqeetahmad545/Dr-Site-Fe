@@ -32,6 +32,13 @@ const AllDoctors: React.FC = () => {
     message.success("Doctor deleted successfully!");
   };
   
+    const handelAddPatient=()=>{
+    navigate('/admin/add-doctor')
+  }
+
+  const handelEditPatient = ( id :any)=>{
+    navigate(`/admin/edit-doctor/${id}`)
+  }
   const columns = [
     { title: "Name", dataIndex: "name" },
     { title: "Email", dataIndex: "email" },
@@ -52,7 +59,7 @@ const AllDoctors: React.FC = () => {
       render: (_: any, record: any) => (
         <>
           <EditOutlined
-            onClick={() => navigate(`/admin/edit-doctor/${record.id}`)}
+            onClick={() => handelEditPatient(record.id)}
             style={{ marginRight: 16, color: "#1890ff", cursor: "pointer" }}
           />
           <DeleteOutlined onClick={() => handleDelete(record.id)} style={{ color: "#ff4d4f", cursor: "pointer" }} />
@@ -67,7 +74,7 @@ const AllDoctors: React.FC = () => {
       title={
         <div className="header-row">
           <span>Doctors</span>
-          <PrimaryButton onClick={() => navigate("/admin/add-doctor")}>
+          <PrimaryButton onClick={() => handelAddPatient()}>
             Add Doctor
           </PrimaryButton>
         </div>

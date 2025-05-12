@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Card, message, Avatar } from "antd";
+import { Form, Input, Card, message, Avatar, Upload } from "antd";
 import { PrimaryButton } from "../../components/PrimaryButton";
-import { UserOutlined } from "@ant-design/icons";
+import { UploadOutlined, UserOutlined } from "@ant-design/icons";
 import type { User } from "../../types/user";
 import { useNavigate } from "react-router-dom";
 
-const Settings: React.FC = () => {
+const AdminSetting: React.FC = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -29,15 +30,37 @@ const Settings: React.FC = () => {
     message.success("Updated settings successfully!");
     setLoading(false);
   };
-
+    const handleAvatarUpload = ({ file, onSuccess }: any) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      setImageUrl(reader.result as string); 
+      onSuccess?.("ok");
+    };
+    reader.readAsDataURL(file);
+  };
   return (
     <Card title="Profile">
-      <div className="user-info">
+          <div className="user-info">
         <Avatar
-          size={64}
-          src={user?.image || "/default-avatar.png"}
+          size={100}
+          src={user?.image || imageUrl }
           icon={<UserOutlined />}
+          style={{ marginBottom: 8 }}
         />
+        <Upload
+          showUploadList={false}
+          beforeUpload={(file) => {
+            const isImage = file.type.startsWith("image/");
+            if (!isImage) {
+              message.error("Only image files are allowed!");
+            }
+            return isImage;
+          }}
+          customRequest={handleAvatarUpload}
+        >
+          <PrimaryButton icon={<UploadOutlined />}>Upload Avatar</PrimaryButton>
+        </Upload>
+
         <div className="user-name" style={{ color: "black" }}>
           {user?.name || "John"}
         </div>
@@ -47,11 +70,18 @@ const Settings: React.FC = () => {
       </div>
 
       <Form layout="vertical" onFinish={handleFinish} form={form}>
-        <Form.Item label="Name" name="name">
+        <Form.Item label="Name" name="name" rules={[{ required: true }]}>
           <Input />
         </Form.Item>
-        <Form.Item label="Email" name="email">
+        <Form.Item label="Email" name="email" rules={[{ required: true }]}>
           <Input type="email" />
+        </Form.Item>
+        <Form.Item label="Phone number" name="phoneNumber">
+          <Input />
+        </Form.Item>
+
+        <Form.Item label="Address" name="address">
+          <Input />
         </Form.Item>
         <Form.Item>
           <div
@@ -74,4 +104,4 @@ const Settings: React.FC = () => {
   );
 };
 
-export default Settings;
+export default AdminSetting;
