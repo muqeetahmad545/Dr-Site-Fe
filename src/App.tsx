@@ -27,6 +27,7 @@ import AddPatient from './pages/admin/AddPatient';
 import AddAppointment from './pages/admin/AddAppointment';
 import PatientSetting from './pages/patient/Settings';
 import DoctorSetting from './pages/doctor/Settings';
+import { Verification } from './pages/Verification';
 function App() {
   const getUser = () => {
     const user = localStorage.getItem('user');
@@ -35,20 +36,18 @@ function App() {
 
   const user = getUser();
 
+  const root = document.documentElement;
 
-const root = document.documentElement;
+  root.style.setProperty('--color-primary', COLORS.primary);
+  root.style.setProperty('--color-primaryHover', COLORS.primaryHover);
+  root.style.setProperty('--color-secondary', COLORS.secondary);
+  root.style.setProperty('--color-danger', COLORS.danger);
+  root.style.setProperty('--color-success', COLORS.success);
+  root.style.setProperty('--color-white', COLORS.white);
+  root.style.setProperty('--gradient-primary', COLORS.gradientPrimary);
 
-root.style.setProperty('--color-primary', COLORS.primary);
-root.style.setProperty('--color-primaryHover', COLORS.primaryHover);
-root.style.setProperty('--color-secondary', COLORS.secondary);
-root.style.setProperty('--color-danger', COLORS.danger);
-root.style.setProperty('--color-success', COLORS.success);
-root.style.setProperty('--color-white', COLORS.white);
-root.style.setProperty('--gradient-primary', COLORS.gradientPrimary);
-
-// root.style.setProperty('--padding', SIZES.padding);
-// root.style.setProperty('--border-radius', `${SIZES.borderRadius}px`);
-
+  // root.style.setProperty('--padding', SIZES.padding);
+  // root.style.setProperty('--border-radius', `${SIZES.borderRadius}px`);
 
   return (
     <Routes>
@@ -66,6 +65,7 @@ root.style.setProperty('--gradient-primary', COLORS.gradientPrimary);
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/forgetPassword" element={<ForgetPassword />} />
+      <Route path="/verification" element={<Verification />} />
 
       <Route
         path="/admin"
@@ -82,7 +82,7 @@ root.style.setProperty('--gradient-primary', COLORS.gradientPrimary);
         <Route path="add-doctor" element={<AddDoctor />} />
         <Route path="edit-doctor/:id" element={<AddDoctor />} />
         <Route path="add-patient" element={<AddPatient />} />
-        <Route path="edit-patient/:id" element={<AddPatient />} /> 
+        <Route path="edit-patient/:id" element={<AddPatient />} />
         <Route path="add-appointment" element={<AddAppointment />} />
         <Route path="edit-appointment/:id" element={<AddAppointment />} />
         <Route path="settings" element={<AdminSetting />} />

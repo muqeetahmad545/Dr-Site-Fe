@@ -9,7 +9,7 @@ import {
   ProfileOutlined,
   UserOutlined,
   MedicineBoxOutlined,
-  PhoneOutlined,
+  // PhoneOutlined,
   DownOutlined,
 } from '@ant-design/icons';
 import { Avatar } from 'antd';
