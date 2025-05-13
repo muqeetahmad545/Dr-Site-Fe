@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { NavLink, Outlet, useLocation } from "react-router-dom";
-import "../css/Layout.css";
+import React, { useEffect, useState } from 'react';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import '../css/Layout.css';
 import {
   DashboardOutlined,
   SettingOutlined,
@@ -11,15 +11,15 @@ import {
   MedicineBoxOutlined,
   PhoneOutlined,
   DownOutlined,
-} from "@ant-design/icons";
-import { Avatar } from "antd";
-import { Header } from "./Header";
-import { LogoutButton } from "./LogoutButton";
-import logo from "../assets/logo.png";
-import type { User } from "../types/user";
+} from '@ant-design/icons';
+import { Avatar } from 'antd';
+import { Header } from './Header';
+import { LogoutButton } from './LogoutButton';
+import logo from '../assets/logo.png';
+import type { User } from '../types/user';
 
 interface Props {
-  role: "admin" | "doctor" | "patient";
+  role: 'admin' | 'doctor' | 'patient';
 }
 
 interface NavLinkItem {
@@ -35,63 +35,70 @@ export const DashboardLayout: React.FC<Props> = ({ role }) => {
   const [openMenus, setOpenMenus] = useState<{ [label: string]: boolean }>({});
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
+    const storedUser = localStorage.getItem('user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
   }, []);
 
-  const route = location.pathname.split("/").pop();
+  const route = location.pathname.split('/').pop();
   const titles: { [key: string]: string } = {
-    dashboard: "Dashboard",
-    settings: "Settings",
-    patient: "Patients",
-    schedule: "Schedule",
-    appointments: "Appointments",
-    doctors: "Doctors List",
-    addDoctor: "Add Doctor",
-    patients: "Patients List",
-    addPatient: "Add Patient",
-    healthOverview: "Health Overview",
-    "all-appointments": "Appointments List",
+    dashboard: 'Dashboard',
+    settings: 'Settings',
+    patient: 'Patients',
+    schedule: 'Schedule',
+    appointments: 'Appointments',
+    doctors: 'Doctors List',
+    addDoctor: 'Add Doctor',
+    patients: 'Patients List',
+    addPatient: 'Add Patient',
+    healthOverview: 'Health Overview',
+    'all-appointments': 'Appointments List',
   };
 
-  const title = titles[route || "dashboard"];
+  const title = titles[route || 'dashboard'];
 
-  const links: Record<"admin" | "doctor" | "patient", NavLinkItem[]> = {
+  const links: Record<'admin' | 'doctor' | 'patient', NavLinkItem[]> = {
     admin: [
-      { to: "dashboard", label: "Dashboard", icon: <DashboardOutlined /> },
+      { to: 'dashboard', label: 'Dashboard', icon: <DashboardOutlined /> },
       {
-        label: "Doctors",
+        label: 'Doctors',
         icon: <UserOutlined />,
         children: [
-          { to: "doctors", label: "Doctor List" },
+          { to: 'doctors', label: 'Doctor List' },
           // { to: "add-doctor", label: "Add Doctor" },
         ],
       },
       {
-        label: "Patients",
+        label: 'Patients',
         icon: <TeamOutlined />,
         children: [
-          { to: "patients", label: "Patient List" },
+          { to: 'patients', label: 'Patient List' },
           // { to: "add-patient", label: "Add Patient" },
         ],
       },
-      { to: "all-appointments", label: "Appointments", icon: <ProfileOutlined /> },
-      { to: "settings", label: "Settings", icon: <SettingOutlined /> },
+      {
+        to: 'all-appointments',
+        label: 'Appointments',
+        icon: <ProfileOutlined />,
+      },
+      { to: 'settings', label: 'Settings', icon: <SettingOutlined /> },
     ],
     doctor: [
-      { to: "dashboard", label: "Dashboard", icon: <DashboardOutlined /> },
-      { to: "patient", label: "Patient", icon: <TeamOutlined /> },
-      { to: "schedule", label: "Schedule", icon: <CalendarOutlined /> },
-      { to: "settings", label: "Settings", icon: <SettingOutlined /> },
+      { to: 'dashboard', label: 'Dashboard', icon: <DashboardOutlined /> },
+      { to: 'patient', label: 'Patient', icon: <TeamOutlined /> },
+      { to: 'schedule', label: 'Schedule', icon: <CalendarOutlined /> },
+      { to: 'settings', label: 'Settings', icon: <SettingOutlined /> },
     ],
     patient: [
-      { to: "dashboard", label: "Dashboard", icon: <DashboardOutlined /> },
-      { to: "healthOverview", label: "Health Overview", icon: <MedicineBoxOutlined /> },
-      { to: "appointments", label: "Appointments", icon: <ProfileOutlined /> },
-      { to: "settings", label: "Settings", icon: <SettingOutlined /> },
-
+      { to: 'dashboard', label: 'Dashboard', icon: <DashboardOutlined /> },
+      {
+        to: 'healthOverview',
+        label: 'Health Overview',
+        icon: <MedicineBoxOutlined />,
+      },
+      { to: 'appointments', label: 'Appointments', icon: <ProfileOutlined /> },
+      { to: 'settings', label: 'Settings', icon: <SettingOutlined /> },
     ],
   };
 
@@ -114,9 +121,13 @@ export const DashboardLayout: React.FC<Props> = ({ role }) => {
         {user && (
           <div className="user-info">
             <div className="avatar-container">
-              <Avatar size={64} src={user.image || "/default-avatar.png"} icon={<UserOutlined />} />
+              <Avatar
+                size={64}
+                src={user.image || '/default-avatar.png'}
+                icon={<UserOutlined />}
+              />
             </div>
-            <div className="user-name">{user.name || "Jhon"}</div>
+            <div className="user-name">{user.name || 'Jhon'}</div>
             <div className="user-role">{user.role.toUpperCase()}</div>
           </div>
         )}
@@ -140,7 +151,9 @@ export const DashboardLayout: React.FC<Props> = ({ role }) => {
                         key={child.to}
                         to={child.to!}
                         className={({ isActive }) =>
-                          isActive ? "nav-link sub-link active" : "nav-link sub-link"
+                          isActive
+                            ? 'nav-link sub-link active'
+                            : 'nav-link sub-link'
                         }
                       >
                         {child.label}
@@ -154,7 +167,7 @@ export const DashboardLayout: React.FC<Props> = ({ role }) => {
                 key={link.to}
                 to={link.to!}
                 className={({ isActive }) =>
-                  isActive ? "nav-link active" : "nav-link"
+                  isActive ? 'nav-link active' : 'nav-link'
                 }
               >
                 <span className="icon">{link.icon}</span>
@@ -165,17 +178,21 @@ export const DashboardLayout: React.FC<Props> = ({ role }) => {
         </nav>
 
         <div className="sidebar-bottom">
-          <div className="emergency-contact-card">
+          {/* <div className="emergency-contact-card">
             <h4>Emergency Contact</h4>
             <p>
-              <PhoneOutlined style={{ marginRight: "8px", color: "var(--color-success)" }} />
+              <PhoneOutlined
+                style={{ marginRight: '8px', color: 'var(--color-success)' }}
+              />
               0987654321
             </p>
-          </div>
+          </div> */}
           <div className="logout-container">
             <LogoutButton />
-            <strong style={{ marginTop: '10px', display: 'block' }}>Cliniva Dashboard © 2025</strong>
-            </div>
+            <strong style={{ marginTop: '10px', display: 'block' }}>
+              Cliniva Dashboard © 2025
+            </strong>
+          </div>
         </div>
       </aside>
 
