@@ -1,16 +1,41 @@
-import { Input, Form, Typography, Card } from 'antd';
+import { Input, Form, Typography, Card, message } from 'antd';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthLayout } from '../components/AuthLayout';
 import { PrimaryButton } from '../components/PrimaryButton';
+import { useResetPasswordMutation } from '../features/api/auth/authAPI';
+import type { APIError } from '../types/error';
 
 const { Title } = Typography;
 
 export const Verification = () => {
+  const [resetPassword, { isLoading, error }] = useResetPasswordMutation();
   const [form] = Form.useForm();
   const navigate = useNavigate();
 
-  const handlelVerify = () => {
-    navigate('/login');
+  const handleVerify = async (values: { otp: string; password: string }) => {
+    try {
+      const email = localStorage.getItem('resetEmail');
+      if (!email) {
+        message.error('No email found. Please go back and enter your email.');
+        return;
+      }
+      const res = await resetPassword({
+        email,
+        otp: values.otp,
+        password: values.password,
+      }).unwrap();
+
+      message.success(res?.message || 'OTP verified successfully');
+      navigate('/login');
+    } catch (err: any) {
+      console.error('Verification failed:', err);
+
+      const errorMsg =
+        'data' in err && err.data?.message
+          ? err.data.message
+          : 'Verification failed';
+      message.error(errorMsg);
+    }
   };
 
   return (
@@ -22,7 +47,14 @@ export const Verification = () => {
         <p style={{ textAlign: 'center' }}>
           <strong>Enter the OTP and reset your account password</strong>
         </p>
-        <Form layout="vertical" form={form} onFinish={handlelVerify}>
+
+            {error && (
+            <div style={{ color: "red", textAlign: "center", marginTop: 10 }}>
+              {(error as APIError).data?.message || "Invalid otp reset failed"}
+            </div>
+          )}
+        {/* ✅ Error Display (optional but clear) */}
+        <Form layout="vertical" form={form} onFinish={handleVerify}>
           <Form.Item
             label="OTP"
             name="otp"
@@ -56,7 +88,9 @@ export const Verification = () => {
                   if (!value || getFieldValue('password') === value) {
                     return Promise.resolve();
                   }
-                  return Promise.reject(new Error('Passwords do not match'));
+                  return Promise.reject(
+                    new Error('Passwords do not match')
+                  );
                 },
               }),
             ]}
@@ -75,6 +109,7 @@ export const Verification = () => {
             <PrimaryButton
               htmlType="submit"
               style={{ width: '250px', marginTop: '10px' }}
+              loading={isLoading}
             >
               Submit
             </PrimaryButton>

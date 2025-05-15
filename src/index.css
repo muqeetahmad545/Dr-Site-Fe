@@ -35,7 +35,7 @@ body {
   background-color: #f4f4f4;
 }
 
-input:-webkit-autofill,
+/* input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 textarea:-webkit-autofill,
@@ -47,7 +47,7 @@ select:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0px 1000px white inset !important;
   -webkit-text-fill-color: black !important;
   transition: background-color 5000s ease-in-out 0s;
-}
+} */
 h1 {
   color: var(--color-primary);
   /* font-size: 3.2em; */

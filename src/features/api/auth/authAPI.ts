@@ -2,9 +2,8 @@ import { apiSlice } from '../../../store/apiSlice';
 import type { User } from '../../../types/user';
 
 interface SignUpData {
-  firstName: string;
+  role: string;
   email: string;
-  password: string;
 }
 
 interface LoginData {
@@ -14,16 +13,26 @@ interface LoginData {
 
 interface ForgotData {
   email: string;
+  message?: string;
 }
 
 interface ResetData {
-  newPassword: string;
-  token: string;
+  email: string;
+  password: string;
+  otp: string;
+  message?: string;
 }
 
 interface SignUpResponse {
   access_token: string;
   data: User;
+  token: string;
+}
+
+interface LoginResponse {
+  status: string;
+  message: string;
+  data: string; 
 }
 
 // RTK Query API setup
@@ -31,30 +40,30 @@ export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     createAccount: builder.mutation<SignUpResponse, SignUpData>({
       query: (userData) => ({
-        url: '/auth/signup',
+        url: '/user/register',
         method: 'POST',
         body: userData,
       }),
     }),
-    login: builder.mutation<SignUpResponse, LoginData>({
+    login: builder.mutation<LoginResponse, LoginData>({
       query: (userData) => ({
-        url: '/auth/login',
+        url: '/user/login',
         method: 'POST',
         body: userData,
       }),
     }),
-    forgotPassword: builder.mutation<void, ForgotData>({
-      query: (values) => ({
-        url: '/auth/forgot-password',
+    forgotPassword: builder.mutation<ForgotData, ForgotData>({
+      query: (userData) => ({
+        url: '/user/forgot-password',
         method: 'POST',
-        body: values,
+        body: userData,
       }),
     }),
-    resetPassword: builder.mutation<void, ResetData>({
-      query: (values) => ({
-        url: `/auth/reset-password?token=${values.token}`,
+    resetPassword: builder.mutation<ResetData, ResetData>({
+      query: (userData) => ({
+        url: `/user/reset-password`,
         method: 'POST',
-        body: { newPassword: values.newPassword },
+        body:userData,
       }),
     }),
   }),
