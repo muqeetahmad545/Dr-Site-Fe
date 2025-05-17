@@ -22,6 +22,7 @@ export const LoginPage = () => {
     try {
       const result = await loginuser({ email, password }).unwrap();
       const token = result.data;
+      localStorage.setItem("token",token)
       const decodedToken = JSON.parse(atob(token.split(".")[1]));
       const userRole = decodedToken.role || "patient";
       localStorage.setItem(

@@ -24,7 +24,7 @@ export const Verification = () => {
         otp: values.otp,
         password: values.password,
       }).unwrap();
-
+      localStorage.removeItem('resetEmail');
       message.success(res?.message || 'OTP verified successfully');
       navigate('/login');
     } catch (err: any) {

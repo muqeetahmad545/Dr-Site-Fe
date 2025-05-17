@@ -1,33 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Table, Tag, Card } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { PrimaryButton } from "../../components/PrimaryButton";
 import { useNavigate } from "react-router-dom";
-
-const appointmentsData  = [
-  {
-    id: 1,
-    pattientName: "John Doe",
-    age: "10",
-    disease: "Liver Disease",
-    date: "5 Dec 2019	",
-    doctorName: "john",
-    active: true,
-  },
-  {
-    id: 2,
-    pattientName: "Jane Smith",
-    age: "10",
-    disease: "Infectious",
-    date: "5 Dec 2019	",
-    doctorName: "jane",
-    active: false,
-  },
-];
+import { useGetAppointmentsQuery } from "../../features/api/admin/adminAPi";
+import type { Appointment } from "../../types/appointment";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 const AllAppointments: React.FC = () => {
-const [appointmentsList, setAppointmentList] = useState(appointmentsData);
-const navigate= useNavigate()
+  const navigate= useNavigate()
+  const { data: appointmentsData, isLoading, isError } = useGetAppointmentsQuery();
+  const [appointmentsList, setAppointmentList] = useState<Appointment[]>([]);
+
+  useEffect(() => {
+    if (appointmentsData && appointmentsData.data) {
+      setAppointmentList(appointmentsData.data);
+    }
+  }, [appointmentsData]);
 
     const handelDeleteAppointment = (id:any)=>{
     const updatedList = appointmentsList.filter((appointment)=>appointment.id !== id)
@@ -67,7 +56,16 @@ const navigate= useNavigate()
       ),
     },
   ];
-
+if (isLoading) {
+  return <LoadingSpinner />;
+}
+  if (isError) {
+return (
+  <div className="text-red-600 font-semibold bg-red-100 p-4 rounded">
+    Error loading Appointments. Please try again later.
+  </div>
+);
+  }
   return (
     <Card
       className="titel-button"
@@ -78,7 +76,9 @@ const navigate= useNavigate()
         </div>
       }
     >
-      <Table dataSource={appointmentsList} columns={columns} rowKey="id" />
+      <Table 
+      loading={isLoading}
+      dataSource={appointmentsList} columns={columns} rowKey="id" />
     </Card>
   );
 };

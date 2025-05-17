@@ -1,45 +1,70 @@
-import React from 'react';
-import { Card, Table, Statistic, Row, Col } from 'antd';
-import { Line } from '@ant-design/charts';
-import { Pie } from '@ant-design/charts';
-
-const dataSource = [
-  { key: '1', name: 'Dr. John Doe', department: 'Cardiology', patients: 12 },
-  { key: '2', name: 'Dr. Smith Lee', department: 'Neurology', patients: 8 },
-];
-
-const columns = [
-  { title: 'Doctor', dataIndex: 'name', key: 'name' },
-  { title: 'Department', dataIndex: 'department', key: 'department' },
-  { title: 'Patients Today', dataIndex: 'patients', key: 'patients' },
-];
+import React, { useEffect, useState } from "react";
+import { Card, Table, Statistic, Row, Col } from "antd";
+import { Line } from "@ant-design/charts";
+import { Pie } from "@ant-design/charts";
+import {
+  useGetDoctorsQuery,
+  useGetPatientsQuery,
+} from "../../features/api/admin/adminAPi";
+import type { Doctor } from "../../types/doctor";
+import LoadingSpinner from "../../components/LoadingSpinner";
+import type { Patient } from "../../types/patient";
 
 const AdminDashboard: React.FC = () => {
+  const { data: doctorsData, isLoading } = useGetDoctorsQuery();
+  const { data: patientData } = useGetPatientsQuery();
+  const [doctorList, setDoctorList] = useState<Doctor[]>([]);
+  const [patientList, setPatientList] = useState<Patient[]>([]);
+  const activeDoctorCount = doctorList.filter(
+    (doc) => doc.status === "active"
+  ).length || 0;
+  const doctorCount = doctorList.length || 0;
+  const patientCount = patientList.length || 0;
+  useEffect(() => {
+    if (patientData && patientData.data) {
+      setPatientList(patientData.data);
+    }
+  }, [patientData]);
+  useEffect(() => {
+    if (doctorsData && doctorsData.data) {
+      setDoctorList(doctorsData.data);
+    }
+  }, [doctorsData]);
+
   const lineData = [
-    { day: 'Monday', appointments: 20 },
-    { day: 'Tuesday', appointments: 30 },
-    { day: 'Wednesday', appointments: 25 },
-    { day: 'Thursday', appointments: 35 },
-    { day: 'Friday', appointments: 40 },
+    { day: "Monday", appointments: 20 },
+    { day: "Tuesday", appointments: 30 },
+    { day: "Wednesday", appointments: 25 },
+    { day: "Thursday", appointments: 35 },
+    { day: "Friday", appointments: 40 },
   ];
 
   const pieData = [
-    { type: 'Doctors', value: 56 },
-    { type: 'Patients', value: 1234 },
-    { type: 'Admin', value: 10 },
+    { type: "Doctors", value: doctorCount },
+    { type: "Patients", value: patientCount  },
+    { type: "Appointments", value: 10 },
   ];
 
+  const columns = [
+    { title: "Doctor", dataIndex: "name", key: "name" },
+    { title: "Department", dataIndex: "department", key: "department" },
+    { title: "Patients Today", dataIndex: "patients", key: "patients" },
+  ];
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+// if (isError) return <div>Error loading dashboard data</div>;
   return (
     <div className="admin-dashboard">
       <Row gutter={16} style={{ marginBottom: 24 }}>
         <Col span={8}>
           <Card>
-            <Statistic title="Total Users" value={1234} />
+            <Statistic title="Total Patient" value={patientCount} />
           </Card>
         </Col>
         <Col span={8}>
           <Card>
-            <Statistic title="Active Doctors" value={56} />
+            <Statistic title="Active Doctors" value={activeDoctorCount} />
           </Card>
         </Col>
         <Col span={8}>
@@ -58,8 +83,8 @@ const AdminDashboard: React.FC = () => {
               yField="appointments"
               seriesField="day"
               smooth
-              height={300} 
-              color={['#00bcd4']}
+              height={300}
+              color={["#00bcd4"]}
               point={{ size: 5 }}
             />
           </Card>
@@ -68,21 +93,30 @@ const AdminDashboard: React.FC = () => {
         <Col span={12}>
           <Card title="User Distribution" bordered={false}>
             <Pie
-            className='pie-chart'
+              className="pie-chart"
               data={pieData}
               angleField="value"
               colorField="type"
               radius={0.8}
-              label={{ visible: true, type: 'outer' }}
-              interactions={[{ type: 'element-active' }]}
-              height={300}  
+              label={{ visible: true, type: "outer" }}
+              interactions={[{ type: "element-active" }]}
+              height={300}
             />
           </Card>
         </Col>
       </Row>
 
-      <Card title="Today’s Top Performing Doctors" style={{ marginTop: 24 }} bordered={false}>
-        <Table dataSource={dataSource} columns={columns} pagination={false} size="middle" />
+      <Card
+        title="Today’s Top Performing Doctors"
+        style={{ marginTop: 24 }}
+        bordered={false}
+      >
+        <Table
+          dataSource={doctorList}
+          columns={columns}
+          pagination={false}
+          size="middle"
+        />
       </Card>
     </div>
   );

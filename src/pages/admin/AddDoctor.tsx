@@ -1,29 +1,29 @@
 // src/pages/admin/RegisterDoctor.tsx
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Card, Form, Input, message, Radio } from "antd";
 import { PrimaryButton } from "../../components/PrimaryButton";
 import { useNavigate, useParams } from "react-router-dom";
 import type { Doctor } from "../../types/doctor";
-const dummyData: { [key: string]: Doctor } = {
-  "1": {
-    name: "John Doe",
-    email: "john@drsite.com",
-    phoneNumber: "+923031411121",
-    gender: "male",
-    specialization: "Cardiology",
-    address: "123 Main St",
-    pastExperience: "10 years at City Hospital",
-  },
-  "2": {
-    name: "John Doe",
-    email: "john@drsite.com",
-    phoneNumber: "+923031411121",
-    gender: "male",
-    specialization: "Cardiology",
-    address: "123 Main St",
-    pastExperience: "10 years at City Hospital",
-  },
-};
+// const dummyData: { [key: string]: Doctor } = {
+//   "1": {
+//     name: "John Doe",
+//     email: "john@drsite.com",
+//     phoneNumber: "+923031411121",
+//     gender: "male",
+//     specialization: "Cardiology",
+//     address: "123 Main St",
+//     pastExperience: "10 years at City Hospital",
+//   },
+//   "2": {
+//     name: "John Doe",
+//     email: "john@drsite.com",
+//     phoneNumber: "+923031411121",
+//     gender: "male",
+//     specialization: "Cardiology",
+//     address: "123 Main St",
+//     pastExperience: "10 years at City Hospital",
+//   },
+// };
 
 const AddDoctor: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -33,11 +33,11 @@ const AddDoctor: React.FC = () => {
 
   const isEdit = Boolean(id);
 
-  useEffect(() => {
-    if (isEdit && dummyData[id!]) {
-      form.setFieldsValue(dummyData[id!]);
-    }
-  }, [id, form, isEdit]);
+  // useEffect(() => {
+  //   if (isEdit && dummyData[id!]) {
+  //     form.setFieldsValue(dummyData[id!]);
+  //   }
+  // }, [id, form, isEdit]);
 
   const handleFinish = (values: Doctor) => {
     setLoading(true);

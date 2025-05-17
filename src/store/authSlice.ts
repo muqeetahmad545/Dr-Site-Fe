@@ -1,4 +1,5 @@
 import { LOCAL_STORAGE_VARIABLES } from '../constants/localStoreVars';
+import type { Profile } from '../types/profile';
 import {
   getConstFromLocalStorage,
   getFromLocalStorage,
@@ -6,7 +7,6 @@ import {
   saveConstToLocalStorage,
   saveToLocalStorage,
 } from '../util/localStorageUtil';
-import type { User } from '../types/user';
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 const initUser = getFromLocalStorage(LOCAL_STORAGE_VARIABLES.AUTH_USER);
@@ -15,12 +15,12 @@ const initToken = getConstFromLocalStorage(
 );
 
 interface AuthState {
-  user: User | null;
+  user: Profile | null;
   token: string | null;
 }
 
 const initialState: AuthState = {
-  user: (initUser as User) || null,
+  user: (initUser as Profile) || null,
   token: (initToken as string) || null,
 };
 
@@ -28,7 +28,7 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    setUser: (state, action: PayloadAction<User>) => {
+    setUser: (state, action: PayloadAction<Profile>) => {
       state.user = action.payload;
       saveToLocalStorage(LOCAL_STORAGE_VARIABLES.AUTH_USER, action.payload);
     },

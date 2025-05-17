@@ -7,64 +7,88 @@ import {
   Avatar,
   Select,
   Upload,
+  Col,
+  Row,
+  DatePicker,
 } from "antd";
 import { PrimaryButton } from "../../components/PrimaryButton";
 import { UploadOutlined, UserOutlined } from "@ant-design/icons";
-import type { User } from "../../types/user";
 import { useNavigate } from "react-router-dom";
+import LoadingSpinner from "../../components/LoadingSpinner";
+import { userProfile } from "../../hooks/userProfile";
+import { useUpdateProfileMutation } from "../../features/api/auth/authAPI";
+import dayjs from "dayjs";
 
 const PatientSetting: React.FC = () => {
   const { Option } = Select;
-
-  const bloodGroupOptions = [
-    { label: "A+", value: "A+" },
-    { label: "A−", value: "A-" },
-    { label: "B+", value: "B+" },
-    { label: "B−", value: "B-" },
-    { label: "AB+", value: "AB+" },
-    { label: "AB−", value: "AB-" },
-    { label: "O+", value: "O+" },
-    { label: "O−", value: "O-" },
-  ];
-
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const { data: profile, isLoading, isError, refetch } = userProfile();
+  const [updateProfile] = useUpdateProfileMutation();
+
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      setUser(parsedUser);
+    if (profile) {
       form.setFieldsValue({
-        name: parsedUser.name || "John",
-        email: parsedUser.email,
+        first_name: profile.data.first_name || "",
+        last_name: profile.data.last_name || "",
+        email: profile.data.email || "",
+        phone: profile.data.phone || "",
+        address: profile.data.address || "",
+        status: profile.data.status || "",
+        gender: profile.data.gender || "",
+        medical_history: profile.data.patient?.medical_history || "",
+        dob: profile.data.patient?.dob ? dayjs(profile.data.patient.dob) : null,
       });
     }
-  }, [form]);
+  }, [profile, form]);
 
-  const handleFinish = (values: any) => {
+  const handleFinish = async (values: any) => {
     setLoading(true);
-    console.log("Settings Submitted:", values);
-    message.success("Updated settings successfully!");
-    setLoading(false);
+    try {
+      await updateProfile(values).unwrap();
+      message.success("Profile updated successfully!");
+      refetch();
+    } catch (err: any) {
+      const errorMessage =
+        err?.data?.message?.message ||
+        err?.data?.message ||
+        err?.message ||
+        "Profile update failed";
+      message.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
   const handleAvatarUpload = ({ file, onSuccess }: any) => {
     const reader = new FileReader();
     reader.onload = () => {
-      setImageUrl(reader.result as string); 
+      setImageUrl(reader.result as string);
       onSuccess?.("ok");
     };
     reader.readAsDataURL(file);
   };
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+  if (isError) {
+    return (
+      <div className="text-red-500">
+        Error loading Profile. Please try again later.
+      </div>
+    );
+  }
   return (
     <Card title="Profile">
       <div className="user-info">
         <Avatar
           size={100}
-          src={user?.image || imageUrl}
+          src={profile?.data.image || imageUrl}
           icon={<UserOutlined />}
           style={{ marginBottom: 8 }}
         />
@@ -83,46 +107,112 @@ const PatientSetting: React.FC = () => {
         </Upload>
 
         <div className="user-name" style={{ color: "black" }}>
-          {user?.name || "John"}
+          {profile?.data.first_name || "John"}{" "}
+          {profile?.data.last_name || "Doe"}
         </div>
         <div className="user-role" style={{ color: "black" }}>
-          {user?.role?.toUpperCase() || "ADMIN"}
+          {profile?.data.role?.toUpperCase() || "PATIENT"}
         </div>
       </div>
 
       <Form layout="vertical" onFinish={handleFinish} form={form}>
-        <Form.Item label="Name" name="name" rules={[{ required: true }]}>
-          <Input />
-        </Form.Item>
-        <Form.Item label="Email" name="email" rules={[{ required: true }]}>
-          <Input type="email" />
-        </Form.Item>
-        <Form.Item label="Phone number" name="phoneNumber">
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Blood Group"
-          name="bloodGroup"
-          rules={[{ required: true, message: "Please select a blood group!" }]}
-        >
-          <Select placeholder="Select a Blood Group">
-            {bloodGroupOptions.map((group) => (
-              <Option key={group.value} value={group.value}>
-                {group.label}
-              </Option>
-            ))}
-          </Select>
-        </Form.Item>{" "}
-        <Form.Item label="Address" name="address">
-          <Input />
-        </Form.Item>
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item
+              label="First Name"
+              name="first_name"
+              rules={[{ required: true }]}
+            >
+              <Input />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              label="Last Name"
+              name="last_name"
+              rules={[{ required: true }]}
+            >
+              <Input />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item label="Email" name="email" rules={[{ required: true }]}>
+              <Input type="email" />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              label="Phone Number"
+              name="phone"
+              rules={[{ required: true }]}
+            >
+              <Input />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item label="Address" name="address">
+              <Input />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item label="Status" name="status">
+              <Select placeholder="Select status">
+                <Option value="active">Active</Option>
+                <Option value="inactive">Inactive</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item
+              label="Gender"
+              name="gender"
+              rules={[{ required: true }]}
+            >
+              <Select placeholder="Select gender">
+                <Option value="male">Male</Option>
+                <Option value="female">Female</Option>
+                <Option value="other">Other</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              label="Date of Birth"
+              name="dob"
+              rules={[{ required: true }]}
+            >
+              <DatePicker style={{ width: "100%" }} />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col span={24}>
+            <Form.Item
+              label="Medical History"
+              name="medical_history"
+              rules={[{ required: true }]}
+            >
+              <Input.TextArea rows={4} placeholder="Enter medical history..." />
+            </Form.Item>
+          </Col>
+        </Row>
         <Form.Item>
           <div
             style={{ display: "flex", justifyContent: "flex-end", gap: "8px" }}
           >
             <PrimaryButton
               onClick={() => navigate("/admin/dashboard")}
-              htmlType="submit"
+              htmlType="button"
               loading={loading}
             >
               Cancel

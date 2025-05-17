@@ -1,13 +1,12 @@
 // src/pages/patient/Appointments.tsx
 
-import  { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Modal,
   Form,
   Input,
   DatePicker,
   TimePicker,
-  notification,
   Row,
   Col,
   Card,
@@ -16,51 +15,55 @@ import {
 import DrSmithImg from "../../assets/driamge.jpg";
 import "../../css/Appointments.css";
 import { PrimaryButton } from "../../components/PrimaryButton";
+import { useGetDoctorsQuery } from "../../features/api/admin/adminAPi";
+import type { Doctor } from "../../types/doctor";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 const { Title, Paragraph } = Typography;
 
 const Appointments = () => {
-  const [appointments, setAppointments] = useState([
-    { id: 1, doctor: "Dr. Smith", date: "2025-05-10", time: "10:00 AM" },
-    { id: 2, doctor: "Dr. Johnson", date: "2025-05-15", time: "02:30 PM" },
-  ]);
-
+  const { data: doctorsData, isLoading, isError } = useGetDoctorsQuery();
+  const [doctorList, setDoctorList] = useState<Doctor[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
 
+  useEffect(() => {
+    if (doctorsData && doctorsData.data) {
+      setDoctorList(doctorsData.data);
+    }
+  }, [doctorsData]);
   const showModal = () => {
     setIsModalVisible(true);
   };
 
-  const handleOk = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        const formattedDate = values.date.format("YYYY-MM-DD");
-        const formattedTime = values.time.format("hh:mm A");
+  // const handleOk = () => {
+  //   form
+  //     .validateFields()
+  //     .then((values) => {
+  //       const formattedDate = values.date.format("YYYY-MM-DD");
+  //       const formattedTime = values.time.format("hh:mm A");
+  //       setAppointments([
+  //         ...appointments,
+  //         {
+  //           id: appointments.length + 1,
+  //           doctor: values.doctor,
+  //           date: formattedDate,
+  //           time: formattedTime,
+  //         },
+  //       ]);
 
-        setAppointments([
-          ...appointments,
-          {
-            id: appointments.length + 1,
-            doctor: values.doctor,
-            date: formattedDate,
-            time: formattedTime,
-          },
-        ]);
+  //       notification.success({
+  //         message: "Appointment Scheduled",
+  //         description: `You have scheduled an appointment with ${values.doctor} on ${formattedDate} at ${formattedTime}.`,
+  //       });
 
-        notification.success({
-          message: "Appointment Scheduled",
-          description: `You have scheduled an appointment with ${values.doctor} on ${formattedDate} at ${formattedTime}.`,
-        });
-
-        form.resetFields();
-        setIsModalVisible(false);
-      })
-      .catch((info) => {
-        console.log("Validation Failed:", info);
-      });
-  };
+  //       form.resetFields();
+  //       setIsModalVisible(false);
+  //     })
+  //     .catch((info) => {
+  //       console.log("Validation Failed:", info);
+  //     });
+  // };
 
   const handleCancel = () => {
     setIsModalVisible(false);
@@ -75,32 +78,11 @@ const Appointments = () => {
   //     description: `You have cancelled your appointment with id: ${id}.`,
   //   });
   // };
-  const doctors = [
-    {
-      id: 1,
-      name: "Dr. Smith",
-      experience: "16 Years Experience Overall",
-      image: DrSmithImg,
-      description: "Work and Student Sickness Certificate",
-      price: "€45.99",
-    },
-    {
-      id: 2,
-      name: "Dr. Johnson",
-      experience: "16 Years Experience Overall",
-      image: DrSmithImg,
-      description: "Work and Student Sickness Certificate",
-      price: "€45.99",
-    },
-    {
-      id: 3,
-      name: "Dr. Lee",
-      experience: "16 Years Experience Overall",
-      image: DrSmithImg,
-      description: "Work and Student Sickness Certificate",
-      price: "€45.99",
-    },
-  ];
+
+    if (isLoading) {
+      return <LoadingSpinner />;
+    }
+    if (isError) return <p>Error fetching doctors.</p>;
 
   return (
     <div>
@@ -154,14 +136,14 @@ const Appointments = () => {
         </Paragraph>
       </div>
       <Row gutter={[16, 16]}>
-        {doctors.map((doctor) => (
+        {doctorList.map((doctor) => (
           <Col xs={24} sm={12} md={8} key={doctor.id}>
             <Card
               hoverable
               cover={
                 <img
-                  alt={doctor.name}
-                  src={doctor.image}
+                  alt={'img'}
+                  src={DrSmithImg}
                   className="doctor-image"
                   style={{ height: "200px", objectFit: "cover", width: "100%" }}
                 />
@@ -178,11 +160,34 @@ const Appointments = () => {
             >
               <Card.Meta
                 style={{ textAlign: "center" }}
-                title={doctor.description}
-                description={doctor.price}
+                title={`${doctor.first_name || "Unknown"} ${
+                  doctor.last_name || "Doctor"
+                }`}
+                description={
+                  doctor?.doctor?.specialization ||
+                  "Specialization not available"
+                }
               />
+
               <Paragraph style={{ textAlign: "center", marginTop: 8 }}>
-                {doctor.experience}
+                <strong>Specialization:</strong>{" "}
+                {doctor?.doctor?.specialization || "Not specified"}
+                <br />
+                <strong>Department:</strong>{" "}
+                {doctor?.doctor?.dept || "Not specified"}
+                <br />
+                <strong>Work History:</strong>{" "}
+                {doctor?.doctor?.work_history || "Not available"}
+                <br />
+                <strong>Available Days:</strong>{" "}
+                {doctor?.doctor?.available_days
+                  ? JSON.parse(doctor?.doctor?.available_days).join(", ")
+                  : "Not available"}
+                <br />
+                <strong>Available Times:</strong>{" "}
+                {doctor?.doctor?.available_times
+                  ? JSON.parse(doctor?.doctor?.available_times).join(", ")
+                  : "Not available"}
               </Paragraph>
             </Card>
           </Col>
@@ -201,7 +206,7 @@ const Appointments = () => {
         className="titel"
         title="Schedule Appointment"
         visible={isModalVisible}
-        onOk={handleOk}
+        // onOk={handleOk}
         onCancel={handleCancel}
       >
         <Form form={form} layout="vertical" name="appointmentForm">

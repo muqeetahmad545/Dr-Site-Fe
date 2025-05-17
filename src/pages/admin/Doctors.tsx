@@ -1,52 +1,82 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Table, Tag, Card, message } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { PrimaryButton } from "../../components/PrimaryButton";
 import { useNavigate } from "react-router-dom";
-
-const doctor = [
-  {
-    id: 1,
-    name: "John Doe",
-    gender: "Male",
-    phone: '+923031411121',
-    email: "john@drsite.com",
-    active: true,
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    gender: "Female",
-    phone: '+923031411122',
-    email: "jane@drsite.com",
-    active: false,
-  },
-];
+import { useGetDoctorsQuery } from "../../features/api/admin/adminAPi";
+import type { Doctor } from "../../types/doctor";
+import LoadingSpinner from "../../components/LoadingSpinner";
+import { userProfile } from "../../hooks/userProfile";
 
 const AllDoctors: React.FC = () => {
   const navigate = useNavigate();
-  const [doctorList, setDoctorList] = React.useState(doctor);
+const { data: profile, refetch } = userProfile();
+  const { data: doctorsData, isLoading, isError } = useGetDoctorsQuery();
+  const [doctorList, setDoctorList] = useState<Doctor[]>([]);
+useEffect(() => {
+  refetch(); 
+}, [refetch]);
+  const isProfileComplete = (profile: any) => {
+    return (
+      profile?.data.first_name &&
+      profile?.data.email &&
+      profile?.data.status === "active"
+    );
+  };
+
+  useEffect(() => {
+    if (doctorsData && doctorsData.data) {
+      setDoctorList(doctorsData.data);
+    }
+  }, [doctorsData]);
+
   const handleDelete = (id: any) => {
+    if (!isProfileComplete(profile)) {
+      message.warning(
+        "To proceed, please complete your profile information in settings."
+      );
+      navigate("/admin/settings");
+      return;
+    }
     const updatedList = doctorList.filter((doc) => doc.id !== id);
     setDoctorList(updatedList);
     message.success("Doctor deleted successfully!");
   };
-  
-    const handelAddPatient=()=>{
-    navigate('/admin/add-doctor')
-  }
 
-  const handelEditPatient = ( id :any)=>{
-    navigate(`/admin/edit-doctor/${id}`)
-  }
+  const handleAddDoctor = () => {
+    if (!isProfileComplete(profile)) {
+      message.warning(
+        "To proceed, please complete your profile information in settings."
+      );
+      navigate("/admin/settings");
+      return;
+    }
+    navigate("/admin/add-doctor");
+  };
+
+  const handelEditPatient = (id: any) => {
+    if (!isProfileComplete(profile)) {
+      message.warning(
+        "To proceed, please complete your profile information in settings."
+      );
+      navigate("/admin/settings");
+      return;
+    }
+    navigate(`/admin/edit-doctor/${id}`);
+  };
+
   const columns = [
-    { title: "Name", dataIndex: "name" },
+    {
+      title: "Name",
+      render: (_: any, record: Doctor) =>
+        `${record.first_name} ${record.last_name}`,
+    },
     { title: "Email", dataIndex: "email" },
-    { title: "Gender", dataIndex: "gender" },
     { title: "Phone", dataIndex: "phone" },
+    { title: "Gender", dataIndex: "gender" },
     {
       title: "Status",
-      dataIndex: "active",
+      dataIndex: "status",
       render: (active: boolean) =>
         active ? (
           <Tag color="green">Active</Tag>
@@ -62,25 +92,34 @@ const AllDoctors: React.FC = () => {
             onClick={() => handelEditPatient(record.id)}
             style={{ marginRight: 16, color: "#1890ff", cursor: "pointer" }}
           />
-          <DeleteOutlined onClick={() => handleDelete(record.id)} style={{ color: "#ff4d4f", cursor: "pointer" }} />
+          <DeleteOutlined
+            onClick={() => handleDelete(record.id)}
+            style={{ color: "#ff4d4f", cursor: "pointer" }}
+          />
         </>
       ),
     },
   ];
-
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+  if (isError) return <p>Error fetching doctors.</p>;
   return (
     <Card
       className="titel-button"
       title={
         <div className="header-row">
           <span>Doctors</span>
-          <PrimaryButton onClick={() => handelAddPatient()}>
-            Add Doctor
-          </PrimaryButton>
+          <PrimaryButton onClick={handleAddDoctor}>Add Doctor</PrimaryButton>
         </div>
       }
     >
-      <Table dataSource={doctorList} columns={columns} rowKey="id" />
+      <Table
+        dataSource={doctorList}
+        columns={columns}
+        rowKey="id"
+        loading={isLoading}
+      />
     </Card>
   );
 };

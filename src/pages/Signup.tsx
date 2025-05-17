@@ -18,7 +18,7 @@ export const SignupPage = () => {
     const { email, role } = values;
     try {
        await createAccount({ email, role }).unwrap();
-      localStorage.setItem("registeredUser", JSON.stringify({ email, role }));
+      // localStorage.setItem("registeredUser", JSON.stringify({ email, role }));
       message.success("Signup successful! Please log in.");
       navigate("/login");
     } catch (err: any) {

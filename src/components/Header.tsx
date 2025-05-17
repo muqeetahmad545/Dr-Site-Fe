@@ -1,39 +1,63 @@
-import React, { useEffect, useState } from "react";
 import "../css/Header.css";
 import { UserOutlined } from "@ant-design/icons";
 import { Avatar, Dropdown } from "antd";
 import { LogoutButton } from "./LogoutButton";
-import type { User } from "../types/user";
+import { userProfile } from "../hooks/userProfile";
+import LoadingSpinner from "./LoadingSpinner";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 interface HeaderProps {
   title?: string;
 }
 
 export const Header: React.FC<HeaderProps> = ({ title = "Dr Site" }) => {
-  const [user, setUser] = useState<User | null>(null);
+    const navigate = useNavigate();
 
+  const {  data: profile, isLoading, isError,refetch } = userProfile();
+  
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
+  refetch(); 
+}, [refetch]);
+  const handelOpenProfie =()=>{
+    navigate(`settings`)
+  }
 
-  const profileCard = user && (
+  // Profile Card Content
+  const profileCard = (
     <div className="profile-card">
       <div className="profile-info">
-        <p>
-          <strong>Welcome,</strong> {user.name || "Jhon"}
+        <div>
+             <Avatar
+             onClick={()=>handelOpenProfie()}
+              size={40}
+              icon={<UserOutlined />}
+              style={{ cursor: "pointer" }}
+            />
+        </div>
+          <p className="mb-3">
+          <strong>Welcome,</strong> {profile?.data.first_name || "John"}
         </p>
         <LogoutButton />
       </div>
     </div>
   );
 
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }  
+  if (isError) {
+    return (
+      <header className="app-header">
+        <p>Error loading profile!</p>
+      </header>
+    );
+  }
+
   return (
     <header className="app-header">
       <h1 className="header-title">{title}</h1>
-      {user && (
+      {profile && (
         <Dropdown
           dropdownRender={() => profileCard}
           placement="bottomRight"
@@ -41,7 +65,7 @@ export const Header: React.FC<HeaderProps> = ({ title = "Dr Site" }) => {
           overlayClassName="custom-dropdown"
         >
           <div className="profile-icon">
-            <div>{user.name || "Jhon"}</div>
+            <div>{profile.data.first_name || "John"}</div>
             <Avatar
               size={40}
               icon={<UserOutlined />}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import '../css/Layout.css';
 import {
@@ -16,7 +16,7 @@ import { Avatar } from 'antd';
 import { Header } from './Header';
 import { LogoutButton } from './LogoutButton';
 import logo from '../assets/logo.png';
-import type { User } from '../types/user';
+import { userProfile } from '../hooks/userProfile';
 
 interface Props {
   role: 'admin' | 'doctor' | 'patient';
@@ -30,16 +30,9 @@ interface NavLinkItem {
 }
 
 export const DashboardLayout: React.FC<Props> = ({ role }) => {
+    const {  data: profile, } = userProfile();
   const location = useLocation();
-  const [user, setUser] = useState<User | null>(null);
   const [openMenus, setOpenMenus] = useState<{ [label: string]: boolean }>({});
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
 
   const route = location.pathname.split('/').pop();
   const titles: { [key: string]: string } = {
@@ -118,17 +111,17 @@ export const DashboardLayout: React.FC<Props> = ({ role }) => {
           {role.charAt(0).toUpperCase() + role.slice(1)} Panel
         </h2>
 
-        {user && (
+        {profile && (
           <div className="user-info">
             <div className="avatar-container">
               <Avatar
                 size={64}
-                src={user.image || '/default-avatar.png'}
+                src={profile.data.image || '/default-avatar.png'}
                 icon={<UserOutlined />}
               />
             </div>
-            <div className="user-name">{user.name || 'Jhon'}</div>
-            <div className="user-role">{user.role.toUpperCase()}</div>
+            <div className="user-name">{profile.data.first_name || 'Jhon'}</div>
+            <div className="user-role"> {role.toUpperCase()} </div>
           </div>
         )}
 

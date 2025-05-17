@@ -1,5 +1,5 @@
 // src/pages/admin/RegisterAppointments.tsx
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Card, Form, Input,Select, message, Radio } from "antd";
 import { PrimaryButton } from "../../components/PrimaryButton";
 import { useNavigate, useParams } from "react-router-dom";
@@ -7,28 +7,28 @@ import type { Appointment } from "../../types/appointment";
 
 const { Option } = Select;
 
-const dummyData: { [key: string]: Appointment } = {
-  "1": {
-    name: "John Doe",
-    email: "john@drsite.com",
-    phoneNumber: "+923031411121",
-    gender: "male",
-    address: "123 Main St",
-    note: "Well",
-    bloodGroup: "O+",
-    disease: "Normal",
-  },
-  "2": {
-    name: "John Doe",
-    email: "john@drsite.com",
-    phoneNumber: "+923031411121",
-    gender: "male",
-    address: "123 Main St",
-    note: "Well",
-    bloodGroup: "O+",
-    disease: "Normal",
-  },
-};
+// const dummyData: { [key: string]: Appointment } = {
+//   "1": {
+//     name: "John Doe",
+//     email: "john@drsite.com",
+//     phoneNumber: "+923031411121",
+//     gender: "male",
+//     address: "123 Main St",
+//     note: "Well",
+//     bloodGroup: "O+",
+//     disease: "Normal",
+//   },
+//   "2": {
+//     name: "John Doe",
+//     email: "john@drsite.com",
+//     phoneNumber: "+923031411121",
+//     gender: "male",
+//     address: "123 Main St",
+//     note: "Well",
+//     bloodGroup: "O+",
+//     disease: "Normal",
+//   },
+// };
 
 const AddAppointment: React.FC = () => {
   const doctorOptions = [
@@ -43,11 +43,11 @@ const AddAppointment: React.FC = () => {
 
   const isEdit = Boolean(id);
 
-  useEffect(() => {
-    if (isEdit && dummyData[id!]) {
-      form.setFieldsValue(dummyData[id!]);
-    }
-  }, [id, form, isEdit]);
+  // useEffect(() => {
+  //   if (isEdit && dummyData[id!]) {
+  //     form.setFieldsValue(dummyData[id!]);
+  //   }
+  // }, [id, form, isEdit]);
 
   const handleFinish = (values: Appointment) => {
     setLoading(true);

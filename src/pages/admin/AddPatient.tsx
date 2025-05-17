@@ -1,29 +1,29 @@
 // src/pages/admin/RegisterPatient.tsx
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 import { Card, Form, Input, message, Radio } from "antd";
 import { PrimaryButton } from "../../components/PrimaryButton";
 import { useNavigate, useParams } from "react-router-dom";
 import type { Patient } from "../../types/patient";
-const dummyData: { [key: string]: Patient } = {
-  "1": {
-    name: "John Doe",
-    email: "john@drsite.com",
-    phoneNumber: "+923031411121",
-    gender: "male",
-    address: "123 Main St",
-    condition: "Well",
-    bloodGroup: "O+",
-  },
-  "2": {
-    name: "John Doe",
-    email: "john@drsite.com",
-    phoneNumber: "+923031411121",
-    gender: "male",
-    address: "123 Main St",
-    condition: "Well",
-    bloodGroup: "O+",
-  },
-};
+// const dummyData: { [key: string]: Patient } = {
+//   "1": {
+//     first_name: "John Doe",
+//     email: "john@drsite.com",
+//     phone: "+923031411121",
+//     gender: "male",
+//     address: "123 Main St",
+//     condition: "Well",
+//     bloodGroup: "O+",
+//   },
+//   "2": {
+//     first_name: "John Doe",
+//     email: "john@drsite.com",
+//     phone: "+923031411121",
+//     gender: "male",
+//     address: "123 Main St",
+//     condition: "Well",
+//     bloodGroup: "O+",
+//   },
+// };
 
 const AddPatient: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -33,11 +33,11 @@ const AddPatient: React.FC = () => {
 
   const isEdit = Boolean(id);
 
-  useEffect(() => {
-    if (isEdit && dummyData[id!]) {
-      form.setFieldsValue(dummyData[id!]);
-    }
-  }, [id, form, isEdit]);
+  // useEffect(() => {
+  //   if (isEdit && dummyData[id!]) {
+  //     form.setFieldsValue(dummyData[id!]);
+  //   }
+  // }, [id, form, isEdit]);
 
   const handleFinish = (values: Patient) => {
     setLoading(true);

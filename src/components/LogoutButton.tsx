@@ -7,7 +7,7 @@ export const LogoutButton = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem('user');
+     localStorage.clear();
     navigate('/login');
   };
 

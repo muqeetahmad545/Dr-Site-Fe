@@ -109,6 +109,11 @@ button:focus-visible {
   justify-content: space-between;
   align-items: center;
 }
+/* Change spinner dot color */
+.ant-spin-dot-item {
+  background-color: var(--color-primaryHover) !important;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
