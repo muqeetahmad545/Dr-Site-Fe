@@ -13,6 +13,7 @@ export const SignupPage = () => {
   const [createAccount, { isLoading, error }] = useCreateAccountMutation();
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const selectedRole = Form.useWatch("role", form);
 
   const handleSignup = async (values: any) => {
     const { email, role } = values;
@@ -59,14 +60,8 @@ export const SignupPage = () => {
           >
             <Input />
           </Form.Item>
+       
           {/* <Form.Item
-            label="Password"
-            name="password"
-            rules={[{ required: true, message: 'Password is required' }]}
-          >
-            <Input.Password />
-          </Form.Item>
-          <Form.Item
             label="Confirm Password"
             name="confirmPassword"
             rules={[{ required: true, message: 'Please confirm password' }]}
@@ -85,6 +80,15 @@ export const SignupPage = () => {
               <Option value="patient">Patient</Option>
             </Select>
           </Form.Item>
+            {selectedRole === "doctor" && (
+            <Form.Item
+              label="IMC Number"
+              name="imc"
+              rules={[{ required: true, message: "IMC Number is required" }]}
+            >
+              <Input />
+            </Form.Item>
+          )}
           <div style={{ textAlign: "center" }}>
             Already have an account?{" "}
             <Link className="link" to="/login">

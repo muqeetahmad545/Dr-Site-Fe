@@ -1,6 +1,7 @@
 import { apiSlice } from '../../../store/apiSlice';
 import type { Profile } from '../../../types/profile';
 
+// ---------- Request Interfaces ----------
 interface SignUpData {
   role: string;
   email: string;
@@ -23,6 +24,7 @@ interface ResetData {
   message?: string;
 }
 
+// ---------- Response Interfaces ----------
 interface SignUpResponse {
   access_token: string;
   data: Profile;
@@ -32,14 +34,14 @@ interface SignUpResponse {
 interface LoginResponse {
   status: string;
   message: string;
-  data: string; 
+  data: string; // might be token or profile info — clarify with backend
 }
 
 interface GetProfileResponse {
   data: Profile;
 }
 
-// RTK Query API setup
+// ---------- Auth API ----------
 export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     createAccount: builder.mutation<SignUpResponse, SignUpData>({
@@ -49,6 +51,7 @@ export const authApi = apiSlice.injectEndpoints({
         body: userData,
       }),
     }),
+
     login: builder.mutation<LoginResponse, LoginData>({
       query: (userData) => ({
         url: '/auth/login',
@@ -56,27 +59,31 @@ export const authApi = apiSlice.injectEndpoints({
         body: userData,
       }),
     }),
-    forgotPassword: builder.mutation<ForgotData, ForgotData>({
+
+    forgotPassword: builder.mutation<{ message: string }, ForgotData>({
       query: (userData) => ({
         url: '/auth/forgot-password',
         method: 'POST',
         body: userData,
       }),
     }),
-    resetPassword: builder.mutation<ResetData, ResetData>({
+
+    resetPassword: builder.mutation<{ message: string }, ResetData>({
       query: (userData) => ({
         url: `/auth/reset-password`,
         method: 'POST',
-        body:userData,
+        body: userData,
       }),
     }),
+
     getProfile: builder.query<GetProfileResponse, void>({
       query: () => ({
         url: '/me',
         method: 'GET',
       }),
-    }),  
-    updateProfile: builder.mutation<GetProfileResponse, void>({
+    }),
+
+    updateProfile: builder.mutation<GetProfileResponse, Partial<Profile>>({
       query: (updatedData) => ({
         url: '/me',
         method: 'PUT',
@@ -84,9 +91,10 @@ export const authApi = apiSlice.injectEndpoints({
       }),
     }),
   }),
+  overrideExisting: true, // Optional: in case you're extending the same endpoint multiple times
 });
 
-// Export hooks for usage in functional components
+// ---------- Export Hooks ----------
 export const {
   useCreateAccountMutation,
   useLoginMutation,
