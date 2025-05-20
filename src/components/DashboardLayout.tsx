@@ -45,7 +45,7 @@ export const DashboardLayout: React.FC<Props> = ({ role }) => {
     addDoctor: 'Add Doctor',
     patients: 'Patients List',
     addPatient: 'Add Patient',
-    healthOverview: 'Health Overview',
+    'health-overview': 'Health Overview',
     'all-appointments': 'Appointments List',
   };
 
@@ -86,7 +86,7 @@ export const DashboardLayout: React.FC<Props> = ({ role }) => {
     patient: [
       { to: 'dashboard', label: 'Dashboard', icon: <DashboardOutlined /> },
       {
-        to: 'healthOverview',
+        to: 'health-overview',
         label: 'Health Overview',
         icon: <MedicineBoxOutlined />,
       },

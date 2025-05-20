@@ -58,27 +58,46 @@ const DoctorSetting: React.FC = () => {
         work_history: profile.data.doctor?.work_history || "",
         available_days: profile.data.doctor?.available_days || "",
         available_times: profile.data.doctor?.available_times || "",
+        imc: profile.data.doctor?.imc || "",
       });
     }
   }, [profile?.data, form]);
 
-  const handleFinish = async (values: any) => {
-    setLoading(true);
-    try {
-      await updateProfile(values).unwrap();
-      message.success("Profile updated successfully!");
-      refetch();
-    } catch (err: any) {
-      const errorMessage =
-        err?.data?.message?.message ||
-        err?.data?.message ||
-        err?.message ||
-        "Profile update failed";
-      message.error(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  };
+const handleFinish = async (values: any) => {
+  setLoading(true);
+  try {
+    const payload = {
+      first_name: values.first_name,
+      last_name: values.last_name,
+      email: values.email,
+      phone: values.phone,
+      address: values.address,
+      gender: values.gender,
+      status: values.status,
+      doctor: {
+        imc: values.imc,
+        specialization: values.specialization,
+        dept: values.dept,
+        work_history: values.work_history,
+        available_days: values.available_days,
+        available_times: values.available_times,
+      },
+    };
+
+    await updateProfile(payload).unwrap();
+    message.success("Profile updated successfully!");
+    refetch();
+  } catch (err: any) {
+    const errorMessage =
+      err?.data?.message?.message ||
+      err?.data?.message ||
+      err?.message ||
+      "Profile update failed";
+    message.error(errorMessage);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleAvatarUpload = ({ file, onSuccess }: any) => {
     const reader = new FileReader();
@@ -223,6 +242,17 @@ const DoctorSetting: React.FC = () => {
             <Form.Item
               label="Department"
               name="dept"
+              rules={[{ required: true }]}
+            >
+              <Input />
+            </Form.Item>
+          </Col>
+        </Row>  
+         <Row gutter={16}>
+          <Col span={24}>
+            <Form.Item
+              label="IMC Number"
+              name="imc"
               rules={[{ required: true }]}
             >
               <Input />

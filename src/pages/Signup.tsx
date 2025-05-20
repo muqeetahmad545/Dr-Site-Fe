@@ -16,9 +16,9 @@ export const SignupPage = () => {
   const selectedRole = Form.useWatch("role", form);
 
   const handleSignup = async (values: any) => {
-    const { email, role } = values;
+    const { email, role,imc } = values;
     try {
-       await createAccount({ email, role }).unwrap();
+       await createAccount({ email, role, imc }).unwrap();
       // localStorage.setItem("registeredUser", JSON.stringify({ email, role }));
       message.success("Signup successful! Please log in.");
       navigate("/login");

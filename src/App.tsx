@@ -1,36 +1,38 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from "react-router-dom";
 
-import AdminDashboard from './pages/admin/Dashboard';
-import AdminSetting from './pages/admin/Settings';
+import AdminDashboard from "./pages/admin/Dashboard";
+import AdminSetting from "./pages/admin/Settings";
 
-import DoctorLayout from './pages/doctor/DoctorLayout';
-import Patients from './pages/doctor/Patients';
-import Schedule from './pages/doctor/Schedule';
+import DoctorLayout from "./pages/doctor/DoctorLayout";
+import Patients from "./pages/doctor/Patients";
+import Schedule from "./pages/doctor/Schedule";
 
-import PatientLayout from './pages/patient/PatientLayout';
-import Appointments from './pages/patient/Appointments';
-import { LoginPage } from './pages/Login';
-import { AdminLayout } from './pages/admin/AdminLayout';
-import { PatientDashboard } from './pages/patient/Dashboard';
-import { ProtectedRoute } from './components/ProtectedRoute';
-import { SignupPage } from './pages/Signup';
-import { NotFound } from './pages/NotFound';
-import { COLORS } from './constants/theme';
-import { ForgetPassword } from './pages/ForgetPassword';
-import HealthOverview from './pages/patient/HealthOverview';
-import DoctorDashboard from './pages/doctor/Dashboard';
-import AllDoctors from './pages/admin/Doctors';
-import AllPatients from './pages/admin/Patients';
-import AllAppointments from './pages/admin/AllAppointments';
-import AddDoctor from './pages/admin/AddDoctor';
-import AddPatient from './pages/admin/AddPatient';
-import AddAppointment from './pages/admin/AddAppointment';
-import PatientSetting from './pages/patient/Settings';
-import DoctorSetting from './pages/doctor/Settings';
-import { Verification } from './pages/Verification';
+import PatientLayout from "./pages/patient/PatientLayout";
+import Appointments from "./pages/patient/Appointments";
+import { LoginPage } from "./pages/Login";
+import { AdminLayout } from "./pages/admin/AdminLayout";
+import { PatientDashboard } from "./pages/patient/Dashboard";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import { SignupPage } from "./pages/Signup";
+import { NotFound } from "./pages/NotFound";
+import { COLORS } from "./constants/theme";
+import { ForgetPassword } from "./pages/ForgetPassword";
+import HealthOverview from "./pages/patient/HealthOverview";
+import DoctorDashboard from "./pages/doctor/Dashboard";
+import AllDoctors from "./pages/admin/Doctors";
+import AllPatients from "./pages/admin/Patients";
+import AllAppointments from "./pages/admin/AllAppointments";
+import AddDoctor from "./pages/admin/AddDoctor";
+import AddPatient from "./pages/admin/AddPatient";
+import AddAppointment from "./pages/admin/AddAppointment";
+import PatientSetting from "./pages/patient/Settings";
+import DoctorSetting from "./pages/doctor/Settings";
+import { Verification } from "./pages/Verification";
+import PatientLogin from "./pages/PatientLogin";
+import ProfileSetup from "./pages/ProfileSetup";
 function App() {
   const getUser = () => {
-    const user = localStorage.getItem('user');
+    const user = localStorage.getItem("user");
     return user ? JSON.parse(user) : null;
   };
 
@@ -38,13 +40,13 @@ function App() {
 
   const root = document.documentElement;
 
-  root.style.setProperty('--color-primary', COLORS.primary);
-  root.style.setProperty('--color-primaryHover', COLORS.primaryHover);
-  root.style.setProperty('--color-secondary', COLORS.secondary);
-  root.style.setProperty('--color-danger', COLORS.danger);
-  root.style.setProperty('--color-success', COLORS.success);
-  root.style.setProperty('--color-white', COLORS.white);
-  root.style.setProperty('--gradient-primary', COLORS.gradientPrimary);
+  root.style.setProperty("--color-primary", COLORS.primary);
+  root.style.setProperty("--color-primaryHover", COLORS.primaryHover);
+  root.style.setProperty("--color-secondary", COLORS.secondary);
+  root.style.setProperty("--color-danger", COLORS.danger);
+  root.style.setProperty("--color-success", COLORS.success);
+  root.style.setProperty("--color-white", COLORS.white);
+  root.style.setProperty("--gradient-primary", COLORS.gradientPrimary);
 
   // root.style.setProperty('--padding', SIZES.padding);
   // root.style.setProperty('--border-radius', `${SIZES.borderRadius}px`);
@@ -63,9 +65,11 @@ function App() {
       />
 
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/profile-setup" element={<ProfileSetup />} />
       <Route path="/signup" element={<SignupPage />} />
-      <Route path="/forgetPassword" element={<ForgetPassword />} />
+      <Route path="/forget-password" element={<ForgetPassword />} />
       <Route path="/verification" element={<Verification />} />
+      <Route path="/patientlogin" element={<PatientLogin />} />
 
       <Route
         path="/admin"
@@ -112,7 +116,7 @@ function App() {
       >
         <Route path="dashboard" element={<PatientDashboard />} />
         <Route path="appointments" element={<Appointments />} />
-        <Route path="healthOverview" element={<HealthOverview />} />
+        <Route path="health-overview" element={<HealthOverview />} />
         <Route path="settings" element={<PatientSetting />} />
       </Route>
 

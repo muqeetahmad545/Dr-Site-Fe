@@ -5,6 +5,7 @@ import type { Profile } from '../../../types/profile';
 interface SignUpData {
   role: string;
   email: string;
+  imc?: string;
 }
 
 interface LoginData {
@@ -34,7 +35,7 @@ interface SignUpResponse {
 interface LoginResponse {
   status: string;
   message: string;
-  data: string; // might be token or profile info — clarify with backend
+  data: string; 
 }
 
 interface GetProfileResponse {
@@ -91,7 +92,7 @@ export const authApi = apiSlice.injectEndpoints({
       }),
     }),
   }),
-  overrideExisting: true, // Optional: in case you're extending the same endpoint multiple times
+  overrideExisting: true, 
 });
 
 // ---------- Export Hooks ----------

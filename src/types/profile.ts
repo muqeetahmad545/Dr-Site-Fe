@@ -11,6 +11,7 @@ export interface Profile {
   status?: string;     
   image?: string; 
     doctor?: {
+    imc?: string;
     specialization?: string;
     dept?: string;
     work_history?: string;
@@ -22,4 +23,9 @@ export interface Profile {
     dob?:string;
   };
   
+}
+
+export interface ProfileSetupProps {
+  formData: any;
+  setFormData: React.Dispatch<React.SetStateAction<any>>;
 }

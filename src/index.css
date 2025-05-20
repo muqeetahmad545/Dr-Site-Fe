@@ -9,7 +9,7 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* background-color: #242424; */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -70,7 +70,17 @@ h1:hover {
   color: var(--color-success);
   color: var(--color-primaryHover);
 }
+.ant-steps-item-icon{
+  background-color: var(--color-primary) !important;
+  color: white !important;
+}
+.ant-steps-item-title::before {
+  background-color: white !important;
 
+}.ant-steps-item-title::after {
+  /* background-color: var(--color-primary) !important; */
+
+}
 h1.active {
   color: var(--color-primaryHover);
   font-weight: bold;

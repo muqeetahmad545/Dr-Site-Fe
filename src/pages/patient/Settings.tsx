@@ -51,7 +51,21 @@ const PatientSetting: React.FC = () => {
   const handleFinish = async (values: any) => {
     setLoading(true);
     try {
-      await updateProfile(values).unwrap();
+      const payload = {
+        first_name: values.first_name,
+        last_name: values.last_name,
+        email: values.email,
+        phone: values.phone,
+        address: values.address,
+        gender: values.gender,
+        status: values.status,
+        patient: {
+        medical_history: values.medical_history || '',
+        dob: values.dob ? values.dob.toISOString() : '',       
+       },
+      };
+  
+      await updateProfile(payload).unwrap();
       message.success("Profile updated successfully!");
       refetch();
     } catch (err: any) {
