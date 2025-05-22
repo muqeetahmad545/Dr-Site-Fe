@@ -9,7 +9,7 @@ import LoadingSpinner from "../../components/LoadingSpinner";
 
 const AllAppointments: React.FC = () => {
   const navigate= useNavigate()
-  const { data: appointmentsData, isLoading, isError } = useGetAppointmentsQuery();
+  const { data: appointmentsData, isLoading } = useGetAppointmentsQuery();
   const [appointmentsList, setAppointmentList] = useState<Appointment[]>([]);
 
   useEffect(() => {
@@ -59,13 +59,13 @@ const AllAppointments: React.FC = () => {
 if (isLoading) {
   return <LoadingSpinner />;
 }
-  if (isError) {
-return (
-  <div className="text-red-600 font-semibold bg-red-100 p-4 rounded">
-    Error loading Appointments. Please try again later.
-  </div>
-);
-  }
+//   if (isError) {
+// return (
+//   <div className="text-red-600 font-semibold bg-red-100 p-4 rounded">
+//     Error loading Appointments. Please try again later.
+//   </div>
+// );
+//   }
   return (
     <Card
       className="titel-button"

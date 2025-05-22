@@ -12,40 +12,42 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ title = "Dr Site" }) => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-  const {  data: profile, isLoading, isError,refetch } = userProfile();
-  
+  const { data: profile, isLoading, isError, refetch } = userProfile();
+
   useEffect(() => {
-  refetch(); 
-}, [refetch]);
-  const handelOpenProfie =()=>{
-    navigate(`settings`)
-  }
+    refetch();
+  }, [refetch]);
 
-  // Profile Card Content
-  const profileCard = (
+  const handelOpenProfie = () => {
+    navigate("settings");
+  };
+
+  const profileCard = profile ? (
     <div className="profile-card">
       <div className="profile-info">
         <div>
-             <Avatar
-             onClick={()=>handelOpenProfie()}
-              size={40}
-              icon={<UserOutlined />}
-              style={{ cursor: "pointer" }}
-            />
+          <Avatar
+            size={40}
+            src={profile.data.profile_image || "/default-avatar.png"}
+            icon={<UserOutlined />}
+            style={{ cursor: "pointer" }}
+            onClick={handelOpenProfie}
+          />
         </div>
-          <p className="mb-3">
-          <strong>Welcome,</strong> {profile?.data.first_name || "John"}
+        <p className="mb-3">
+          <strong>Welcome,</strong> {profile.data.first_name || "John"}
         </p>
         <LogoutButton />
       </div>
     </div>
-  );
+  ) : null;
 
   if (isLoading) {
     return <LoadingSpinner />;
-  }  
+  }
+
   if (isError) {
     return (
       <header className="app-header">
@@ -68,6 +70,7 @@ export const Header: React.FC<HeaderProps> = ({ title = "Dr Site" }) => {
             <div>{profile.data.first_name || "John"}</div>
             <Avatar
               size={40}
+              src={profile.data.profile_image || "/default-avatar.png"}
               icon={<UserOutlined />}
               style={{ cursor: "pointer" }}
             />

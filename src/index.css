@@ -3,18 +3,22 @@
 @tailwind utilities;
 
 :root {
-  font-family: 'Roboto', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Roboto", system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 600;
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* background-color: #242424; */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+/* Finished steps */
+.ant-steps-item-finish .ant-steps-item-title::after {
+  background-color: var(--color-primary) !important;
 }
 
 a {
@@ -46,6 +50,9 @@ input {
   caret-color: #000;
   transition: background-color 0s ease !important;
 }
+.ant-upload-wrapper .ant-upload-drag-icon .anticon {
+  color: var(--color-primary) !important;
+}
 
 /* input:-webkit-autofill,
 input:-webkit-autofill:hover,
@@ -70,7 +77,30 @@ h1:hover {
   color: var(--color-success);
   color: var(--color-primaryHover);
 }
+.ant-steps-item-icon {
+  background-color: var(--color-primary) !important;
+  color: white !important;
+  border: none !important;
+  box-shadow: none !important;
+}
 
+.ant-steps-item-icon svg {
+  fill: white !important;
+}
+
+.ant-steps-item-title::before {
+  background-color: white !important;
+  border: none !important;
+  content: none !important;
+}
+
+.ant-steps-item-icon {
+  background-color: var(--color-primary) !important;
+  color: white !important;
+}
+.ant-steps-item-title::before {
+  background-color: white !important;
+}
 h1.active {
   color: var(--color-primaryHover);
   font-weight: bold;
@@ -128,7 +158,7 @@ button:focus-visible {
 }
 
 .login-page {
-  background-image: url('/assets/login-bg.jpg');
+  background-image: url("/assets/login-bg.jpg");
   background-size: cover;
   background-position: center;
   height: 100vh;

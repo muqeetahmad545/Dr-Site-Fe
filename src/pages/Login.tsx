@@ -1,10 +1,10 @@
-import { Button, Input, Form, Typography, Card, message } from "antd";
+import { Input, Form, Typography, Card, message } from "antd";
 import { useNavigate, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { AuthLayout } from "../components/AuthLayout";
-import { signInWithPopup } from "firebase/auth";
-import { GoogleOutlined, FacebookFilled } from "@ant-design/icons";
-import { auth, facebookProvider, googleProvider } from "../firebase";
+// import { signInWithPopup } from "firebase/auth";
+// import { GoogleOutlined, FacebookFilled } from "@ant-design/icons";
+// import { auth, facebookProvider, googleProvider } from "../firebase";
 import { PrimaryButton } from "../components/PrimaryButton";
 import { useLoginMutation } from "../features/api/auth/authAPI";
 import type { APIError } from "../types/error";
@@ -22,7 +22,7 @@ export const LoginPage = () => {
     try {
       const result = await loginuser({ email, password }).unwrap();
       const token = result.data;
-      localStorage.setItem("token",token)
+      localStorage.setItem("token", token);
       const decodedToken = JSON.parse(atob(token.split(".")[1]));
       const userRole = decodedToken.role || "patient";
       localStorage.setItem(
@@ -37,35 +37,35 @@ export const LoginPage = () => {
     }
   };
 
-  const loginWithGoogle = async () => {
-    try {
-      const result = await signInWithPopup(auth, googleProvider);
-      const user = result.user;
-      localStorage.setItem(
-        "user",
-        JSON.stringify({ email: user.email, role: "patient" })
-      );
-      navigate("/patient/dashboard");
-    } catch (error) {
-      console.error(error);
-      alert("Google login failed");
-    }
-  };
+  // const loginWithGoogle = async () => {
+  //   try {
+  //     const result = await signInWithPopup(auth, googleProvider);
+  //     const user = result.user;
+  //     localStorage.setItem(
+  //       "user",
+  //       JSON.stringify({ email: user.email, role: "patient" })
+  //     );
+  //     navigate("/patient/dashboard");
+  //   } catch (error) {
+  //     console.error(error);
+  //     alert("Google login failed");
+  //   }
+  // };
 
-  const loginWithFacebook = async () => {
-    try {
-      const result = await signInWithPopup(auth, facebookProvider);
-      const user = result.user;
-      localStorage.setItem(
-        "user",
-        JSON.stringify({ email: user.email, role: "patient" })
-      );
-      navigate("/patient/dashboard");
-    } catch (error) {
-      console.error(error);
-      alert("Facebook login failed");
-    }
-  };
+  // const loginWithFacebook = async () => {
+  //   try {
+  //     const result = await signInWithPopup(auth, facebookProvider);
+  //     const user = result.user;
+  //     localStorage.setItem(
+  //       "user",
+  //       JSON.stringify({ email: user.email, role: "patient" })
+  //     );
+  //     navigate("/patient/dashboard");
+  //   } catch (error) {
+  //     console.error(error);
+  //     alert("Facebook login failed");
+  //   }
+  // };
 
   useEffect(() => {
     const user = localStorage.getItem("user");
@@ -87,12 +87,12 @@ export const LoginPage = () => {
         <p style={{ textAlign: "center" }}>
           <strong>Welcome to Cliniva</strong>
         </p>
-           {error && (
-          <div style={{ color: 'red', textAlign: 'center', marginBottom: 12 }}>
+        {error && (
+          <div style={{ color: "red", textAlign: "center", marginBottom: 12 }}>
             {(error as APIError).data?.message || "Login failed"}
           </div>
         )}
-        
+
         <Form layout="vertical" onFinish={handleLogin}>
           <Form.Item
             label="Email Address"
@@ -115,13 +115,13 @@ export const LoginPage = () => {
           <div style={{ textAlign: "right", marginBottom: "1rem" }}>
             <Link
               className="link"
-              to="/forgetPassword"
+              to="/forgot-password"
               style={{ fontSize: "0.9rem" }}
             >
               Forgot password?
             </Link>
           </div>
-       
+
           <Form.Item style={{ display: "flex", justifyContent: "center" }}>
             <PrimaryButton
               htmlType="submit"
@@ -132,7 +132,7 @@ export const LoginPage = () => {
             </PrimaryButton>
           </Form.Item>
         </Form>
-        <div style={{ marginTop: 16, textAlign: "center" }}>
+        {/* <div style={{ marginTop: 16, textAlign: "center" }}>
           Or continue with
         </div>
         <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
@@ -147,7 +147,7 @@ export const LoginPage = () => {
           >
             Facebook
           </Button>
-        </div>
+        </div> */}
 
         <div style={{ textAlign: "center", marginTop: 24 }}>
           Don't have an account?{" "}

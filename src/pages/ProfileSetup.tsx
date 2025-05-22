@@ -1,43 +1,42 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Steps, message, Card, Form } from "antd";
-import { useLocation, useNavigate } from "react-router-dom";
-import LoadingSpinner from "../../components/LoadingSpinner";
-import { PrimaryButton } from "../../components/PrimaryButton";
+import PersonalInfo from "./ProfileSetup/PersonalInfo";
+import Avaibilty from "./ProfileSetup/Avaibilty";
+import EducationDetails from "./ProfileSetup/EducationDetails";
+import KycDetails from "./ProfileSetup/KycDetails";
+import { PrimaryButton } from "../components/PrimaryButton";
 import {
+  useGetProfileQuery,
   useUpdateProfileMutation,
   useVerifyTokenMutation,
-} from "../../features/api/auth/authAPI";
-import { userProfile } from "../../hooks/userProfile";
-import Avaibilty from "../ProfileSetup/Avaibilty";
-import EducationDetails from "../ProfileSetup/EducationDetails";
-import KycDetails from "../ProfileSetup/KycDetails";
-import PersonalInfo from "../ProfileSetup/PersonalInfo";
+} from "../features/api/auth/authAPI";
+import { useLocation, useNavigate } from "react-router-dom";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const { Step } = Steps;
 
 const ProfileSetup: React.FC = () => {
   const location = useLocation();
-  const navigate = useNavigate();
-  const [form] = Form.useForm();
 
+  const [form] = Form.useForm();
+  const navigate = useNavigate();
   const [current, setCurrent] = useState(0);
   const [formData, setFormData] = useState<any>({});
-  const [isTokenVerified, setIsTokenVerified] = useState(false);
-  const [isPageLoading, setIsPageLoading] = useState(true);
-
-  console.log("isTokenVerified", isTokenVerified);
-  const [updateProfile, { isLoading }] = useUpdateProfileMutation();
+  const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
   const [verifyToken] = useVerifyTokenMutation();
-  const tokenChecked = useRef(false);
-  const { data: profile, refetch } = userProfile();
-
+  const tokenVerifiedOnce = useRef(false);
+  const [tokenReady, setTokenReady] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const { data: profile } = useGetProfileQuery(undefined, {
+    skip: !tokenReady,
+  });
   useEffect(() => {
     const pathname = location.pathname;
     const isTokenRoute = pathname.startsWith("/profile-setup/");
     const token = isTokenRoute ? pathname.split("/profile-setup/")[1] : null;
 
-    if (token && !tokenChecked.current) {
-      tokenChecked.current = true;
+    if (token && !tokenVerifiedOnce.current) {
+      tokenVerifiedOnce.current = true;
 
       verifyToken(token)
         .unwrap()
@@ -49,25 +48,29 @@ const ProfileSetup: React.FC = () => {
             const decodedToken = JSON.parse(atob(verifiedToken.split(".")[1]));
             localStorage.setItem("decodedToken", JSON.stringify(decodedToken));
           } catch (e) {
-            console.error("Token decode failed:", e);
+            console.error("Failed to decode token", e);
           }
 
           message.success("Email verified successfully!");
-          setIsTokenVerified(true);
+
+          setTokenReady(true);
+
+          setTimeout(() => navigate("/profile-setup"), 500);
         })
         .catch((err) => {
           const msg = err?.data?.message;
 
           if (msg === "email already verified") {
             message.warning("Email already verified. Please log in.");
-            navigate("/login");
+            setTimeout(() => navigate("/login"), 1000);
           } else {
             message.error("Invalid or expired verification token.");
             navigate("/login");
           }
         });
-    } else {
-      setIsTokenVerified(true);
+    } else if (!token && !tokenVerifiedOnce.current) {
+      tokenVerifiedOnce.current = true;
+      setTokenReady(true);
     }
   }, [location.pathname, navigate, verifyToken]);
 
@@ -89,13 +92,13 @@ const ProfileSetup: React.FC = () => {
 
       setFormData({
         first_name: profile.data.first_name || "",
-        profile_image: profile.data.profile_image || "",
         last_name: profile.data.last_name || "",
         email: profile.data.email || "",
         phone: profile.data.phone || "",
         address: profile.data.address || "",
         passport_number: profile.data.passport_number || "",
         address_document: profile.data.address_document || "",
+        profile_image: profile.data.profile_image || "",
         status: profile.data.status || "",
         gender: profile.data.gender || "",
 
@@ -117,7 +120,7 @@ const ProfileSetup: React.FC = () => {
         })),
       });
 
-      setIsPageLoading(false);
+      setIsLoading(false);
     }
   }, [profile?.data]);
 
@@ -149,14 +152,13 @@ const ProfileSetup: React.FC = () => {
       ),
     },
     {
-      title: "KYC Details",
+      title: "Kyc Details",
       content: (
         <KycDetails form={form} formData={formData} setFormData={setFormData} />
       ),
     },
   ];
 
-  // const next = () => setCurrent((prev) => prev + 1);
   const next = async () => {
     try {
       await form.validateFields();
@@ -165,6 +167,7 @@ const ProfileSetup: React.FC = () => {
       message.error("Please fill all required fields before proceeding.");
     }
   };
+
   const prev = () => setCurrent((prev) => prev - 1);
 
   const handleFinish = async () => {
@@ -189,7 +192,7 @@ const ProfileSetup: React.FC = () => {
           formData.education?.map((item: any) => ({
             degree_name: item.degree_name,
             institution_name: item.institution_name,
-            degree_document: item.degree_document || "Dummy document",
+            degree_document: item.degree_document,
           })) || [],
         insurance:
           formData.insurance?.map((item: any) => ({
@@ -203,8 +206,7 @@ const ProfileSetup: React.FC = () => {
     try {
       const response = await updateProfile(payload).unwrap();
       message.success(response.message);
-      refetch();
-      // navigate("/login");
+      navigate("/login");
     } catch (err: any) {
       const errorMessage =
         err?.data?.message?.message ||
@@ -215,13 +217,12 @@ const ProfileSetup: React.FC = () => {
     }
   };
 
-  // ✅ Show loader while verifying token or loading profile
-  if (isPageLoading || isLoading) {
+  if (isLoading) {
     return <LoadingSpinner />;
   }
 
   return (
-    <Card title="Profile Setup" style={{ margin: "0" }}>
+    <Card title="Profile Setup" style={{ margin: "2rem" }}>
       <Steps current={current} style={{ marginBottom: 24 }}>
         {steps.map((item) => (
           <Step key={item.title} title={item.title} />
@@ -230,7 +231,7 @@ const ProfileSetup: React.FC = () => {
       <div style={{ minHeight: 200, padding: 24 }}>
         {steps[current].content}
       </div>
-      <div style={{ textAlign: "right" }}>
+      <div style={{ marginTop: 24, textAlign: "right" }}>
         {current > 0 && (
           <PrimaryButton onClick={prev} style={{ marginRight: 8 }}>
             Previous
@@ -240,7 +241,7 @@ const ProfileSetup: React.FC = () => {
           <PrimaryButton onClick={next}>Next</PrimaryButton>
         )}
         {current === steps.length - 1 && (
-          <PrimaryButton onClick={handleFinish} loading={isLoading}>
+          <PrimaryButton onClick={handleFinish} loading={isUpdating}>
             Finish
           </PrimaryButton>
         )}

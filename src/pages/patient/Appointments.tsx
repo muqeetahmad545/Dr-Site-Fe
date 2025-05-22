@@ -22,7 +22,7 @@ import LoadingSpinner from "../../components/LoadingSpinner";
 const { Title, Paragraph } = Typography;
 
 const Appointments = () => {
-  const { data: doctorsData, isLoading, isError } = useGetDoctorsQuery();
+  const { data: doctorsData, isLoading } = useGetDoctorsQuery();
   const [doctorList, setDoctorList] = useState<Doctor[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
@@ -82,7 +82,7 @@ const Appointments = () => {
     if (isLoading) {
       return <LoadingSpinner />;
     }
-    if (isError) return <p>Error fetching doctors.</p>;
+    // if (isError) return <p>Error fetching doctors.</p>;
 
   return (
     <div>

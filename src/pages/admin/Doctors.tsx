@@ -11,7 +11,7 @@ import { userProfile } from "../../hooks/userProfile";
 const AllDoctors: React.FC = () => {
   const navigate = useNavigate();
 const { data: profile, refetch } = userProfile();
-  const { data: doctorsData, isLoading, isError } = useGetDoctorsQuery();
+  const { data: doctorsData, isLoading } = useGetDoctorsQuery();
   const [doctorList, setDoctorList] = useState<Doctor[]>([]);
 useEffect(() => {
   refetch(); 
@@ -103,7 +103,6 @@ useEffect(() => {
   if (isLoading) {
     return <LoadingSpinner />;
   }
-  if (isError) return <p>Error fetching doctors.</p>;
   return (
     <Card
       className="titel-button"

@@ -1,15 +1,17 @@
 import { Button } from "antd";
 import { COLORS } from "../constants/theme";
 import type { CSSProperties, ReactNode } from "react";
+import type { ButtonType } from "antd/es/button";
 
 interface PrimaryButtonProps {
   children: ReactNode;
   onClick?: () => void;
   style?: CSSProperties;
   htmlType?: "button" | "submit" | "reset";
+  type?: ButtonType;
   block?: boolean;
   loading?: boolean;
-  icon?: ReactNode; 
+  icon?: ReactNode;
 }
 
 export const PrimaryButton = ({
@@ -17,20 +19,22 @@ export const PrimaryButton = ({
   onClick,
   style,
   htmlType = "button",
+  type = "primary",
   block = false,
   loading = false,
-  icon, 
+  icon,
 }: PrimaryButtonProps) => {
   return (
     <Button
-      type="primary"
+      type={type}
       onClick={onClick}
       htmlType={htmlType}
       block={block}
-      icon={icon} 
+      icon={icon}
       loading={loading}
       style={{
-        backgroundImage: COLORS.gradientPrimary,
+        backgroundImage:
+          type === "primary" ? COLORS.gradientPrimary : undefined,
         borderColor: COLORS.primary,
         ...style,
       }}
