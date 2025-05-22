@@ -1,349 +1,252 @@
-import React, { useEffect, useState } from "react";
-import {
-  Form,
-  Input,
-  Card,
-  message,
-  Avatar,
-  Upload,
-  Row,
-  Col,
-  Select,
-  TimePicker,
-} from "antd";
-import { PrimaryButton } from "../../components/PrimaryButton";
-import { UploadOutlined, UserOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { Steps, message, Card, Form } from "antd";
+import { useLocation, useNavigate } from "react-router-dom";
 import LoadingSpinner from "../../components/LoadingSpinner";
+import { PrimaryButton } from "../../components/PrimaryButton";
+import {
+  useUpdateProfileMutation,
+  useVerifyTokenMutation,
+} from "../../features/api/auth/authAPI";
 import { userProfile } from "../../hooks/userProfile";
-import { useUpdateProfileMutation } from "../../features/api/auth/authAPI";
+import Avaibilty from "../ProfileSetup/Avaibilty";
+import EducationDetails from "../ProfileSetup/EducationDetails";
+import KycDetails from "../ProfileSetup/KycDetails";
+import PersonalInfo from "../ProfileSetup/PersonalInfo";
 
-const DoctorSetting: React.FC = () => {
-  const { Option } = Select;
+const { Step } = Steps;
+
+const ProfileSetup: React.FC = () => {
+  const location = useLocation();
   const navigate = useNavigate();
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false);
-  const { data: profile, isLoading, isError, refetch } = userProfile();
-  const [updateProfile] = useUpdateProfileMutation();
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [timeSlots, setTimeSlots] = useState<string[]>([]);
 
-  const handleAddTime = (time: any) => {
-    if (!time) return;
-    const formattedTime = time.format("HH:mm");
-    if (timeSlots.includes(formattedTime)) {
-      message.warning("This time is already added");
-      return;
+  const [current, setCurrent] = useState(0);
+  const [formData, setFormData] = useState<any>({});
+  const [isTokenVerified, setIsTokenVerified] = useState(false);
+  const [isPageLoading, setIsPageLoading] = useState(true);
+
+  console.log("isTokenVerified", isTokenVerified);
+  const [updateProfile, { isLoading }] = useUpdateProfileMutation();
+  const [verifyToken] = useVerifyTokenMutation();
+  const tokenChecked = useRef(false);
+  const { data: profile, refetch } = userProfile();
+
+  useEffect(() => {
+    const pathname = location.pathname;
+    const isTokenRoute = pathname.startsWith("/profile-setup/");
+    const token = isTokenRoute ? pathname.split("/profile-setup/")[1] : null;
+
+    if (token && !tokenChecked.current) {
+      tokenChecked.current = true;
+
+      verifyToken(token)
+        .unwrap()
+        .then((res) => {
+          const verifiedToken: any = res.data;
+          localStorage.setItem("token", verifiedToken);
+
+          try {
+            const decodedToken = JSON.parse(atob(verifiedToken.split(".")[1]));
+            localStorage.setItem("decodedToken", JSON.stringify(decodedToken));
+          } catch (e) {
+            console.error("Token decode failed:", e);
+          }
+
+          message.success("Email verified successfully!");
+          setIsTokenVerified(true);
+        })
+        .catch((err) => {
+          const msg = err?.data?.message;
+
+          if (msg === "email already verified") {
+            message.warning("Email already verified. Please log in.");
+            navigate("/login");
+          } else {
+            message.error("Invalid or expired verification token.");
+            navigate("/login");
+          }
+        });
+    } else {
+      setIsTokenVerified(true);
     }
-    setTimeSlots([...timeSlots, formattedTime]);
-    form.setFieldsValue({ available_times: [...timeSlots, formattedTime] });
-  };
+  }, [location.pathname, navigate, verifyToken]);
 
   useEffect(() => {
-    refetch();
-  }, [refetch]);
+    if (profile?.data) {
+      const doctor = profile.data.doctor || {};
 
-  useEffect(() => {
-    if (profile) {
-      form.setFieldsValue({
+      const education = Array.isArray(doctor.education)
+        ? doctor.education
+        : doctor.education
+        ? [doctor.education]
+        : [];
+
+      const insurance = Array.isArray(doctor.insurance)
+        ? doctor.insurance
+        : doctor.insurance
+        ? [doctor.insurance]
+        : [];
+
+      setFormData({
         first_name: profile.data.first_name || "",
+        profile_image: profile.data.profile_image || "",
         last_name: profile.data.last_name || "",
         email: profile.data.email || "",
         phone: profile.data.phone || "",
         address: profile.data.address || "",
+        passport_number: profile.data.passport_number || "",
+        address_document: profile.data.address_document || "",
         status: profile.data.status || "",
         gender: profile.data.gender || "",
-        specialization: profile.data.doctor?.specialization || "",
-        dept: profile.data.doctor?.dept || "",
-        work_history: profile.data.doctor?.work_history || "",
-        available_days: profile.data.doctor?.available_days || "",
-        available_times: profile.data.doctor?.available_times || "",
-        imc: profile.data.doctor?.imc || "",
-      });
-    }
-  }, [profile?.data, form]);
 
-const handleFinish = async (values: any) => {
-  setLoading(true);
-  try {
+        imc: doctor.imc || "",
+        specialization: doctor.specialization || "",
+        available_days: doctor.available_days || [],
+        available_times: doctor.available_times || [],
+
+        education: education.map((edu: any) => ({
+          degree_name: edu.degree_name,
+          institution_name: edu.institution_name,
+          degree_document: edu.degree_document,
+        })),
+
+        insurance: insurance.map((ins: any) => ({
+          insurance_number: ins.insurance_number,
+          insurance_company: ins.insurance_company,
+          insurance_document: ins.insurance_document,
+        })),
+      });
+
+      setIsPageLoading(false);
+    }
+  }, [profile?.data]);
+
+  const steps = [
+    {
+      title: "Personal Info",
+      content: (
+        <PersonalInfo
+          form={form}
+          formData={formData}
+          setFormData={setFormData}
+        />
+      ),
+    },
+    {
+      title: "Avaibilty Details",
+      content: (
+        <Avaibilty form={form} formData={formData} setFormData={setFormData} />
+      ),
+    },
+    {
+      title: "Education Details",
+      content: (
+        <EducationDetails
+          form={form}
+          formData={formData}
+          setFormData={setFormData}
+        />
+      ),
+    },
+    {
+      title: "KYC Details",
+      content: (
+        <KycDetails form={form} formData={formData} setFormData={setFormData} />
+      ),
+    },
+  ];
+
+  // const next = () => setCurrent((prev) => prev + 1);
+  const next = async () => {
+    try {
+      await form.validateFields();
+      setCurrent((prev) => prev + 1);
+    } catch (error) {
+      message.error("Please fill all required fields before proceeding.");
+    }
+  };
+  const prev = () => setCurrent((prev) => prev - 1);
+
+  const handleFinish = async () => {
     const payload = {
-      first_name: values.first_name,
-      last_name: values.last_name,
-      email: values.email,
-      phone: values.phone,
-      address: values.address,
-      gender: values.gender,
-      status: values.status,
+      profile_image: formData.profile_image,
+      first_name: formData.first_name,
+      last_name: formData.last_name,
+      gender: formData.gender,
+      email: formData.email,
+      password: formData.password,
+      phone: formData.phone,
+      address: formData.address,
+      passport_number: formData.passport_number,
+      address_document: formData.address_document || "",
+      status: formData.status,
       doctor: {
-        imc: values.imc,
-        specialization: values.specialization,
-        dept: values.dept,
-        work_history: values.work_history,
-        available_days: values.available_days,
-        available_times: values.available_times,
+        imc: formData.imc,
+        specialization: formData.specialization,
+        available_days: formData.available_days || [],
+        available_times: formData.available_times || [],
+        education:
+          formData.education?.map((item: any) => ({
+            degree_name: item.degree_name,
+            institution_name: item.institution_name,
+            degree_document: item.degree_document || "Dummy document",
+          })) || [],
+        insurance:
+          formData.insurance?.map((item: any) => ({
+            insurance_number: item.insurance_number,
+            insurance_company: item.insurance_company,
+            insurance_document: item.insurance_document || "Dummy document",
+          })) || [],
       },
     };
 
-    await updateProfile(payload).unwrap();
-    message.success("Profile updated successfully!");
-    refetch();
-  } catch (err: any) {
-    const errorMessage =
-      err?.data?.message?.message ||
-      err?.data?.message ||
-      err?.message ||
-      "Profile update failed";
-    message.error(errorMessage);
-  } finally {
-    setLoading(false);
-  }
-};
-
-  const handleAvatarUpload = ({ file, onSuccess }: any) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      setImageUrl(reader.result as string);
-      onSuccess?.("ok");
-    };
-    reader.readAsDataURL(file);
+    try {
+      const response = await updateProfile(payload).unwrap();
+      message.success(response.message);
+      refetch();
+      // navigate("/login");
+    } catch (err: any) {
+      const errorMessage =
+        err?.data?.message?.message ||
+        err?.data?.message ||
+        err?.message ||
+        "Profile update failed";
+      message.error(errorMessage);
+    }
   };
-  if (isLoading) {
+
+  // ✅ Show loader while verifying token or loading profile
+  if (isPageLoading || isLoading) {
     return <LoadingSpinner />;
   }
-  if (isError) {
-    return (
-      <div className="text-red-500">
-        Error loading Profile. Please try again later.
-      </div>
-    );
-  }
+
   return (
-    <Card title="Profile">
-      <div className="user-info">
-        <Avatar
-          size={100}
-          src={profile?.data.image || imageUrl}
-          icon={<UserOutlined />}
-          style={{ marginBottom: 8 }}
-        />
-        <Upload
-          showUploadList={false}
-          beforeUpload={(file) => {
-            const isImage = file.type.startsWith("image/");
-            if (!isImage) {
-              message.error("Only image files are allowed!");
-            }
-            return isImage;
-          }}
-          customRequest={handleAvatarUpload}
-        >
-          <PrimaryButton icon={<UploadOutlined />}>Upload Avatar</PrimaryButton>
-        </Upload>
-
-        <div className="user-name" style={{ color: "black" }}>
-          {profile?.data.first_name || "John"}{" "}
-          {profile?.data.last_name || "Doe"}
-        </div>
-        <div className="user-role" style={{ color: "black" }}>
-          {profile?.data.role?.toUpperCase() || "DOCTOR"}
-        </div>
+    <Card title="Profile Setup" style={{ margin: "0" }}>
+      <Steps current={current} style={{ marginBottom: 24 }}>
+        {steps.map((item) => (
+          <Step key={item.title} title={item.title} />
+        ))}
+      </Steps>
+      <div style={{ minHeight: 200, padding: 24 }}>
+        {steps[current].content}
       </div>
-
-      <Form layout="vertical" onFinish={handleFinish} form={form}>
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              label="First Name"
-              name="first_name"
-              rules={[{ required: true }]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              label="Last Name"
-              name="last_name"
-              rules={[{ required: true }]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item label="Email" name="email" rules={[{ required: true }]}>
-              <Input type="email" />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              label="Phone Number"
-              name="phone"
-              rules={[{ required: true }]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item label="Address" name="address">
-              <Input />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item label="Status" name="status">
-              <Select placeholder="Select status">
-                <Option value="active">Active</Option>
-                <Option value="inactive">Inactive</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              label="Gender"
-              name="gender"
-              rules={[{ required: true }]}
-            >
-              <Select placeholder="Select gender">
-                <Option value="male">Male</Option>
-                <Option value="female">Female</Option>
-                <Option value="other">Other</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              label="Specialization"
-              name="specialization"
-              rules={[{ required: true }]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              label="Work History"
-              name="work_history"
-              rules={[{ required: true }]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              label="Department"
-              name="dept"
-              rules={[{ required: true }]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
-        </Row>  
-         <Row gutter={16}>
-          <Col span={24}>
-            <Form.Item
-              label="IMC Number"
-              name="imc"
-              rules={[{ required: true }]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Row gutter={16}>
-          <Col span={24}>
-            <Form.Item
-              label="Available Days"
-              name="available_days"
-              rules={[
-                { required: true, message: "Please select available days" },
-              ]}
-            >
-              <Select
-                mode="multiple"
-                placeholder="Select days"
-                style={{ width: "100%" }}
-              >
-                <Option value="monday">Monday</Option>
-                <Option value="tuesday">Tuesday</Option>
-                <Option value="wednesday">Wednesday</Option>
-                <Option value="thursday">Thursday</Option>
-                <Option value="friday">Friday</Option>
-                <Option value="saturday">Saturday</Option>
-                <Option value="sunday">Sunday</Option>
-              </Select>
-            </Form.Item>
-
-            {/* Equal width for both time-related inputs */}
-            <div
-              style={{
-                display: "flex",
-                gap: "16px",
-                alignItems: "flex-start",
-              }}
-            >
-              <div style={{ flex: 1 }}>
-                <Form.Item label="Add Time Slot" style={{ marginBottom: 0 }}>
-                  <TimePicker
-                    format="HH:mm"
-                    onChange={handleAddTime}
-                    placeholder="Select time"
-                    style={{ width: "100%" }}
-                  />
-                </Form.Item>
-              </div>
-
-              <div style={{ flex: 1 }}>
-                <Form.Item
-                  label="Available Times"
-                  name="available_times"
-                  rules={[
-                    { required: true, message: "Please add at least one time" },
-                  ]}
-                  style={{ marginBottom: 0 }}
-                >
-                  <Select
-                    mode="tags"
-                    placeholder="Selected time slots"
-                    open={false}
-                    style={{ width: "100%" }}
-                  />
-                </Form.Item>
-              </div>
-            </div>
-          </Col>
-        </Row>
-
-        <Form.Item>
-          <div
-            className="mt-5"
-            style={{ display: "flex", justifyContent: "flex-end", gap: "8px" }}
-          >
-            <PrimaryButton
-              onClick={() => navigate("/admin/dashboard")}
-              htmlType="button"
-              loading={loading}
-            >
-              Cancel
-            </PrimaryButton>
-            <PrimaryButton htmlType="submit" loading={loading}>
-              Save Changes
-            </PrimaryButton>
-          </div>
-        </Form.Item>
-      </Form>
+      <div style={{ textAlign: "right" }}>
+        {current > 0 && (
+          <PrimaryButton onClick={prev} style={{ marginRight: 8 }}>
+            Previous
+          </PrimaryButton>
+        )}
+        {current < steps.length - 1 && (
+          <PrimaryButton onClick={next}>Next</PrimaryButton>
+        )}
+        {current === steps.length - 1 && (
+          <PrimaryButton onClick={handleFinish} loading={isLoading}>
+            Finish
+          </PrimaryButton>
+        )}
+      </div>
     </Card>
   );
 };
 
-export default DoctorSetting;
+export default ProfileSetup;

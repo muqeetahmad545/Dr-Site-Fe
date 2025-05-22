@@ -65,11 +65,12 @@ function App() {
       />
 
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/profile-setup/:token" element={<ProfileSetup />} />
       <Route path="/profile-setup" element={<ProfileSetup />} />
       <Route path="/signup" element={<SignupPage />} />
-      <Route path="/forget-password" element={<ForgetPassword />} />
+      <Route path="/forgot-password" element={<ForgetPassword />} />
       <Route path="/verification" element={<Verification />} />
-      <Route path="/patientlogin" element={<PatientLogin />} />
+      <Route path="/patient-login" element={<PatientLogin />} />
 
       <Route
         path="/admin"

@@ -1,128 +1,175 @@
-import React, { useEffect, useState } from "react";
-import { Form, Input, Row, Col, Upload, Button, message } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
+import React, { useEffect } from "react";
+import { Form, Input, Row, Col, Button, message } from "antd";
+import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import type { ProfileSetupProps } from "../../types/profile";
+import { PrimaryButton } from "../../components/PrimaryButton";
+import FileUploader from "../../components/FileUploader";
 
-const EducationDetails: React.FC<ProfileSetupProps> = ({ formData, setFormData }) => {
-  const [form] = Form.useForm();
-  const [imageUrl, setImageUrl] = useState<string | null>(formData.proof_of_education || null);
-
+const EducationDetails: React.FC<ProfileSetupProps> = ({
+  form,
+  formData,
+  setFormData,
+}) => {
+  // Sync form with incoming formData
   useEffect(() => {
     form.setFieldsValue(formData);
   }, [formData, form]);
 
-  const handleFileUpload = ({ file, onSuccess }: any) => {
-    const isImage = file.type.startsWith("image/");
-    if (!isImage) {
-      message.error("Only image files are allowed!");
-      return;
-    }
+  // Upload handler that works per index in the education list
+  const handleEducationDocumentFileUpload =
+    (index: number) =>
+    async ({ file, onSuccess }: any) => {
+      if (!file) {
+        message.error("No file selected");
+        return;
+      }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      const base64 = reader.result as string;
-      setImageUrl(base64);
-      setFormData((prev: any) => ({
-        ...prev,
-        proof_of_education: base64,
-      }));
-      onSuccess?.("ok");
+      const isValidFile =
+        file.type.startsWith("application/") || file.type.startsWith("image/");
+      if (!isValidFile) {
+        message.error("Only document or image files are allowed!");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64String = reader.result as string;
+
+        const updatedEducation = [...(form.getFieldValue("education") || [])];
+        updatedEducation[index] = {
+          ...updatedEducation[index],
+          degree_document: base64String,
+        };
+
+        form.setFieldValue("education", updatedEducation);
+        setFormData((prev: any) => ({
+          ...prev,
+          education: updatedEducation,
+        }));
+
+        onSuccess?.("ok");
+      };
+
+      reader.onerror = () => {
+        message.error("Failed to read file");
+      };
+
+      reader.readAsDataURL(file);
     };
-    reader.readAsDataURL(file);
-  };
-
-  const handleValuesChange = (_: any, allValues: any) => {
-    setFormData((prev: any) => ({
-      ...prev,
-      ...allValues,
-    }));
-  };
 
   return (
     <Form
       form={form}
       layout="vertical"
-      onValuesChange={handleValuesChange}
       initialValues={formData}
+      onValuesChange={(_, allValues) =>
+        setFormData((prev: any) => ({ ...prev, ...allValues }))
+      }
     >
-      <Form.Item
-        label="IMC Number"
-        name="imc"
-        rules={[{ required: true, message: "IMC Number is required" }]}
-      >
-        <Input />
-      </Form.Item>
-
       <Row gutter={16}>
-        <Col span={12}>
-          <Form.Item
-            label="Department"
-            name="dept"
-            rules={[{ required: true }]}
-          >
-            <Input />
-          </Form.Item>
-        </Col>
-        <Col span={12}>
-          <Form.Item
-            label="Specialization"
-            name="specialization"
-            rules={[{ required: true }]}
-          >
-            <Input />
-          </Form.Item>
-        </Col>
-      </Row>
-
-      <Row gutter={16}>
-        <Col span={12}>
-          <Form.Item
-            label="Educator"
-            name="educator"
-            rules={[{ required: true }]}
-          >
-            <Input />
-          </Form.Item>
-        </Col>
-        <Col span={12}>
-          <Form.Item
-            label="Education Institute"
-            name="education_institute"
-            rules={[{ required: true }]}
-          >
-            <Input />
-          </Form.Item>
-        </Col>
-      </Row>
-
-      <Row gutter={16}>
-        <Col span={12}>
-          <Form.Item label="Proof of Education" name="proof_of_education">
-            <Upload
-              name="proof_of_education_file"
-              listType="picture"
-              showUploadList={false}
-              beforeUpload={(file) => {
-                const isImage = file.type.startsWith("image/");
-                if (!isImage) {
-                  message.error("Only image files are allowed!");
-                }
-                return isImage;
-              }}
-              customRequest={handleFileUpload}
-            >
-              <Button icon={<UploadOutlined />}>Upload Proof</Button>
-            </Upload>
-
-            {/* Optional: Show uploaded preview if available */}
-            {imageUrl && (
-              <img
-                src={imageUrl}
-                alt="Proof"
-                style={{ marginTop: 10, width: 100, height: "auto", borderRadius: 4 }}
-              />
+        <Col span={24}>
+          <Form.List name="education">
+            {(fields, { add, remove }) => (
+              <>
+                {fields.map(({ key, name }, index) => (
+                  <div
+                    key={key}
+                    style={{
+                      border: "1px solid #f0f0f0",
+                      padding: 16,
+                      marginBottom: 16,
+                      borderRadius: 8,
+                    }}
+                  >
+                    <Row gutter={16}>
+                      <Col span={12}>
+                        <Form.Item
+                          name={[name, "degree_name"]}
+                          label="Degree Name"
+                          rules={[
+                            { required: true, message: "Enter degree name" },
+                          ]}
+                        >
+                          <Input placeholder="e.g., MBBS" />
+                        </Form.Item>
+                      </Col>
+                      <Col span={12}>
+                        <Form.Item
+                          name={[name, "institution_name"]}
+                          label="Institution Name"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Enter institution name",
+                            },
+                          ]}
+                        >
+                          <Input placeholder="e.g., King Edward" />
+                        </Form.Item>
+                      </Col>
+                      <Col span={24}>
+                        <Form.Item label="Degree Document">
+                          {/* Check if the degree_document is available and show the image */}
+                          {form.getFieldValue([
+                            "education",
+                            index,
+                            "degree_document",
+                          ]) ? (
+                            <img
+                              src={form.getFieldValue([
+                                "education",
+                                index,
+                                "degree_document",
+                              ])}
+                              alt="Degree Document"
+                              style={{
+                                maxWidth: "100%",
+                                maxHeight: "150px",
+                                marginBottom: 8,
+                              }}
+                            />
+                          ) : (
+                            <p>No document uploaded</p>
+                          )}
+                          <FileUploader
+                            name="file"
+                            multiple={false}
+                            customRequest={handleEducationDocumentFileUpload(
+                              index
+                            )}
+                            maxCount={1}
+                          />
+                        </Form.Item>
+                      </Col>
+                      <Col
+                        span={4}
+                        style={{ display: "flex", alignItems: "center" }}
+                      >
+                        <Button
+                          danger
+                          type="text"
+                          icon={<MinusCircleOutlined />}
+                          onClick={() => remove(name)}
+                        >
+                          Remove
+                        </Button>
+                      </Col>
+                    </Row>
+                  </div>
+                ))}
+                <Form.Item>
+                  <PrimaryButton
+                    type="dashed"
+                    onClick={() => add()}
+                    icon={<PlusOutlined />}
+                    block
+                  >
+                    Add Education
+                  </PrimaryButton>
+                </Form.Item>
+              </>
             )}
-          </Form.Item>
+          </Form.List>
         </Col>
       </Row>
     </Form>

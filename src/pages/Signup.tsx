@@ -13,18 +13,21 @@ export const SignupPage = () => {
   const [createAccount, { isLoading, error }] = useCreateAccountMutation();
   const [form] = Form.useForm();
   const navigate = useNavigate();
-  const selectedRole = Form.useWatch("role", form);
 
   const handleSignup = async (values: any) => {
-    const { email, role,imc } = values;
+    const { email, password } = values;
+    // Ensure role is set to "doctor" before sending data
+    const role = "doctor";
     try {
-       await createAccount({ email, role, imc }).unwrap();
-      // localStorage.setItem("registeredUser", JSON.stringify({ email, role }));
-      message.success("Signup successful! Please log in.");
+      const response = await createAccount({
+        email,
+        password,
+        role,
+      }).unwrap();
+      message.success(response.message);
       navigate("/login");
     } catch (err: any) {
       console.error("Signup failed:", err.data.message);
-      console.log("err", err.data.message);
       message.error(err.data.message);
     }
   };
@@ -53,6 +56,20 @@ export const SignupPage = () => {
         )}
 
         <Form layout="vertical" form={form} onFinish={handleSignup}>
+          {/* <Form.Item
+            label="First Name"
+            name="first_name"
+            rules={[{ required: true, message: "first_name is required" }]}
+          >
+            <Input />
+          </Form.Item>{" "}
+          <Form.Item
+            label="Last Name"
+            name="last_name"
+            rules={[{ required: true, message: "last_name is required" }]}
+          >
+            <Input />
+          </Form.Item> */}
           <Form.Item
             label="Email Address"
             name="email"
@@ -60,35 +77,40 @@ export const SignupPage = () => {
           >
             <Input />
           </Form.Item>
-       
-          {/* <Form.Item
-            label="Confirm Password"
-            name="confirmPassword"
-            rules={[{ required: true, message: 'Please confirm password' }]}
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[{ required: true, message: "Password is required" }]}
           >
             <Input.Password />
-          </Form.Item> */}
+          </Form.Item>
+          <Form.Item
+            label="Confirm Password"
+            name="confirmPassword"
+            dependencies={["password"]}
+            rules={[
+              { required: true, message: "Please confirm your password" },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  return value === getFieldValue("password")
+                    ? Promise.resolve()
+                    : Promise.reject("Passwords do not match");
+                },
+              }),
+            ]}
+          >
+            <Input.Password />
+          </Form.Item>
           <Form.Item
             label="Role"
             name="role"
-            initialValue="patient"
+            initialValue="doctor"
             rules={[{ required: true, message: "Please select a role" }]}
           >
-            <Select>
-              <Option value="admin">Admin</Option>
+            <Select disabled>
               <Option value="doctor">Doctor</Option>
-              <Option value="patient">Patient</Option>
             </Select>
           </Form.Item>
-            {selectedRole === "doctor" && (
-            <Form.Item
-              label="IMC Number"
-              name="imc"
-              rules={[{ required: true, message: "IMC Number is required" }]}
-            >
-              <Input />
-            </Form.Item>
-          )}
           <div style={{ textAlign: "center" }}>
             Already have an account?{" "}
             <Link className="link" to="/login">

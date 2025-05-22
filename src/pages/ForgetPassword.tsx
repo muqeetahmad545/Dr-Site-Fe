@@ -55,11 +55,11 @@ export const ForgetPassword = () => {
         <p style={{ textAlign: "center" }}>
           <strong>Let Us Help You</strong>
         </p>
-           {error && (
-            <div style={{ color: "red", textAlign: "center", marginTop: 10 }}>
-              {(error as APIError).data?.message || "Password reset failed"}
-            </div>
-          )}
+        {error && (
+          <div style={{ color: "red", textAlign: "center", marginTop: 10 }}>
+            {(error as APIError).data?.message || "Password reset failed"}
+          </div>
+        )}
         <Form layout="vertical" onFinish={handleForgetPassword}>
           <Form.Item
             label="Enter your registered email address."
@@ -72,7 +72,6 @@ export const ForgetPassword = () => {
               onChange={(e) => setemail(e.target.value)}
             />
           </Form.Item>
-       
 
           <Form.Item style={{ display: "flex", justifyContent: "center" }}>
             <PrimaryButton

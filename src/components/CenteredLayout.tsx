@@ -1,28 +1,30 @@
-
 import type { ReactNode } from "react";
 
 interface CenteredLayoutProps {
   children: ReactNode;
-  maxWidth?: number; 
+  maxWidth?: number;
 }
 
-export const CenteredLayout = ({ children, maxWidth = 480 }: CenteredLayoutProps) => {
+export const CenteredLayout = ({
+  children,
+  maxWidth = 480,
+}: CenteredLayoutProps) => {
   return (
     <div
       style={{
-        height: '100vh',
+        height: "100vh",
         // width: '100vw',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#f0f2f5',
-        padding: '1rem',
-        boxSizing: 'border-box',
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#f0f2f5",
+        padding: "1rem",
+        boxSizing: "border-box",
       }}
     >
       <div
         style={{
-          width: '100%',
+          width: "100%",
           maxWidth: maxWidth,
         }}
       >

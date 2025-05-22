@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Form, Row, Col, Select, TimePicker } from "antd";
+import { Form, Row, Col, Select, TimePicker, Input } from "antd";
 import type { ProfileSetupProps } from "../../types/profile";
 
 const { Option } = Select;
 
-const Avaibilty: React.FC<ProfileSetupProps> = ({ formData, setFormData }) => {
-  const [form] = Form.useForm();
-  const [timeSlots, setTimeSlots] = useState<string[]>(formData.available_times || []);
+const Avaibilty: React.FC<ProfileSetupProps> = ({
+  form,
+  formData,
+  setFormData,
+}) => {
+  // const [form] = Form.useForm();
+  const [timeSlots, setTimeSlots] = useState<string[]>(
+    formData.available_times || []
+  );
 
   // Load form values from parent on mount
   useEffect(() => {
@@ -46,13 +52,39 @@ const Avaibilty: React.FC<ProfileSetupProps> = ({ formData, setFormData }) => {
       initialValues={formData}
     >
       <Row gutter={16}>
+        <Col span={12}>
+          <Form.Item
+            label="IMC Number"
+            name="imc"
+            rules={[{ required: true, message: "IMC Number is required" }]}
+          >
+            <Input />
+          </Form.Item>
+        </Col>
+        <Col span={12}>
+          <Form.Item
+            label="Specialization"
+            name="specialization"
+            rules={[{ required: true }]}
+          >
+            <Input />
+          </Form.Item>
+        </Col>
+      </Row>
+      <Row gutter={16}>
         <Col span={24}>
           <Form.Item
             label="Available Days"
             name="available_days"
-            rules={[{ required: true, message: "Please select available days" }]}
+            rules={[
+              { required: true, message: "Please select available days" },
+            ]}
           >
-            <Select mode="multiple" placeholder="Select days" style={{ width: "100%" }}>
+            <Select
+              mode="multiple"
+              placeholder="Select days"
+              style={{ width: "100%" }}
+            >
               <Option value="monday">Monday</Option>
               <Option value="tuesday">Tuesday</Option>
               <Option value="wednesday">Wednesday</Option>
