@@ -60,11 +60,11 @@ const PatientSetting: React.FC = () => {
         gender: values.gender,
         status: values.status,
         patient: {
-        medical_history: values.medical_history || '',
-        dob: values.dob ? values.dob.toISOString() : '',       
-       },
+          medical_history: values.medical_history || "",
+          dob: values.dob ? values.dob.toISOString() : "",
+        },
       };
-  
+
       await updateProfile(payload).unwrap();
       message.success("Profile updated successfully!");
       refetch();
@@ -102,7 +102,7 @@ const PatientSetting: React.FC = () => {
       <div className="user-info">
         <Avatar
           size={100}
-          src={profile?.data.image || imageUrl}
+          src={profile?.data.profile_image || imageUrl}
           icon={<UserOutlined />}
           style={{ marginBottom: 8 }}
         />

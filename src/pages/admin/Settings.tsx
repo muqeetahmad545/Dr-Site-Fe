@@ -85,7 +85,7 @@ const AdminSetting: React.FC = () => {
       <div className="user-info">
         <Avatar
           size={100}
-          src={profile?.data.image || imageUrl}
+          src={profile?.data.profile_image || imageUrl}
           icon={<UserOutlined />}
           style={{ marginBottom: 8 }}
         />
