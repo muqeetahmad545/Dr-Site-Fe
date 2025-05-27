@@ -5,7 +5,7 @@
 :root {
   font-family: "Roboto", system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
-  font-weight: 600;
+  /* font-weight: 600; */
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
@@ -51,6 +51,11 @@ input {
   transition: background-color 0s ease !important;
 }
 .ant-upload-wrapper .ant-upload-drag-icon .anticon {
+  color: var(--color-primary) !important;
+}
+/* Prevent step hover from turning blue */
+
+.ant-steps-item-title:hover {
   color: var(--color-primary) !important;
 }
 

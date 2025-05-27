@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Steps, message, Card, Form } from "antd";
 import PersonalInfo from "./ProfileSetup/PersonalInfo";
-import Avaibilty from "./ProfileSetup/Avaibilty";
+import Availability from "./ProfileSetup/Availability";
 import EducationDetails from "./ProfileSetup/EducationDetails";
 import KycDetails from "./ProfileSetup/KycDetails";
 import { PrimaryButton } from "../components/PrimaryButton";
@@ -77,47 +77,41 @@ const ProfileSetup: React.FC = () => {
   useEffect(() => {
     if (profile?.data) {
       const doctor = profile.data.doctor || {};
-
-      const education = Array.isArray(doctor.education)
-        ? doctor.education
-        : doctor.education
-        ? [doctor.education]
-        : [];
-
-      const insurance = Array.isArray(doctor.insurance)
-        ? doctor.insurance
-        : doctor.insurance
-        ? [doctor.insurance]
-        : [];
+      const availObj =
+        doctor.doctor_availabilities || doctor.available_days || {};
 
       setFormData({
         first_name: profile.data.first_name || "",
+        profile_image: profile.data.profile_image || {},
         last_name: profile.data.last_name || "",
         email: profile.data.email || "",
         phone: profile.data.phone || "",
         address: profile.data.address || "",
         passport_number: profile.data.passport_number || "",
-        address_document: profile.data.address_document || "",
-        profile_image: profile.data.profile_image || "",
+        address_document: profile.data.address_document || {},
         status: profile.data.status || "",
         gender: profile.data.gender || "",
-
         imc: doctor.imc || "",
         specialization: doctor.specialization || "",
-        available_days: doctor.available_days || [],
-        available_times: doctor.available_times || [],
+        doctor_availabilities: availObj,
+        doctor_availabilities_list: Object.keys(availObj || {}), // ✅ FIX
+        education: Array.isArray(doctor.education)
+          ? doctor.education.map((edu: any) => ({
+              degree_name: edu.degree_name,
+              institution_name: edu.institution_name,
+              degree_document: edu.degree_document || {},
+            }))
+          : [],
+        insurance: Array.isArray(doctor.insurance)
+          ? doctor.insurance.map((ins: any) => ({
+              insurance_number: ins.insurance_number,
+              insurance_company: ins.insurance_company,
+              insurance_document: ins.insurance_document || {},
+            }))
+          : [],
 
-        education: education.map((edu: any) => ({
-          degree_name: edu.degree_name,
-          institution_name: edu.institution_name,
-          degree_document: edu.degree_document,
-        })),
-
-        insurance: insurance.map((ins: any) => ({
-          insurance_number: ins.insurance_number,
-          insurance_company: ins.insurance_company,
-          insurance_document: ins.insurance_document,
-        })),
+        insuranceCheckbox:
+          Array.isArray(doctor.insurance) && doctor.insurance.length > 0,
       });
 
       setIsLoading(false);
@@ -136,9 +130,13 @@ const ProfileSetup: React.FC = () => {
       ),
     },
     {
-      title: "Avaibilty Details",
+      title: "Availability Details",
       content: (
-        <Avaibilty form={form} formData={formData} setFormData={setFormData} />
+        <Availability
+          form={form}
+          formData={formData}
+          setFormData={setFormData}
+        />
       ),
     },
     {
@@ -171,43 +169,49 @@ const ProfileSetup: React.FC = () => {
   const prev = () => setCurrent((prev) => prev - 1);
 
   const handleFinish = async () => {
-    const payload = {
-      profile_image: formData.profile_image,
-      first_name: formData.first_name,
-      last_name: formData.last_name,
-      gender: formData.gender,
-      email: formData.email,
-      password: formData.password,
-      phone: formData.phone,
-      address: formData.address,
-      passport_number: formData.passport_number,
-      address_document: formData.address_document || "",
-      status: formData.status,
-      doctor: {
-        imc: formData.imc,
-        specialization: formData.specialization,
-        available_days: formData.available_days || [],
-        available_times: formData.available_times || [],
-        education:
-          formData.education?.map((item: any) => ({
-            degree_name: item.degree_name,
-            institution_name: item.institution_name,
-            degree_document: item.degree_document,
-          })) || [],
-        insurance:
-          formData.insurance?.map((item: any) => ({
-            insurance_number: item.insurance_number,
-            insurance_company: item.insurance_company,
-            insurance_document: item.insurance_document || "Dummy document",
-          })) || [],
-      },
-    };
-
     try {
+      await form.validateFields();
+      const doctor_availabilities = formData.doctor_availabilities || {};
+
+      const payload = {
+        profile_image: formData.profile_image || { iv: "", data: "" },
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        gender: formData.gender,
+        email: formData.email,
+        password: formData.password,
+        phone: formData.phone,
+        address: formData.address,
+        passport_number: formData.passport_number,
+        address_document: formData.address_document || { iv: "", data: "" },
+        status: formData.status,
+        doctor: {
+          imc: formData.imc,
+          specialization: formData.specialization,
+          doctor_availabilities,
+          education:
+            formData.education?.map((item: any) => ({
+              degree_name: item.degree_name,
+              institution_name: item.institution_name,
+              degree_document: item.degree_document || { iv: "", data: "" },
+            })) || [],
+          insurance:
+            formData.insurance?.map((item: any) => ({
+              insurance_number: item.insurance_number,
+              insurance_company: item.insurance_company,
+              insurance_document: item.insurance_document || {
+                iv: "",
+                data: "",
+              },
+            })) || [],
+        },
+      };
+
       const response = await updateProfile(payload).unwrap();
       message.success(response.message);
       navigate("/login");
     } catch (err: any) {
+      console.log("err", err);
       const errorMessage =
         err?.data?.message?.message ||
         err?.data?.message ||

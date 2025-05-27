@@ -4,28 +4,26 @@ import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import type { ProfileSetupProps } from "../../types/profile";
 import FileUploader from "../../components/FileUploader";
 import { PrimaryButton } from "../../components/PrimaryButton";
+import {
+  encryptBase64,
+  decryptBase64,
+  SECRET_KEY,
+  type EncryptedResult,
+} from "../../helper/Crypto";
 
 const KycDetails: React.FC<ProfileSetupProps> = ({
   form,
   formData,
   setFormData,
 }) => {
-  // const [form] = Form.useForm();
   const [showInsuranceFields, setShowInsuranceFields] = useState<boolean>(
     !!formData.insuranceCheckbox
   );
 
   useEffect(() => {
     form.setFieldsValue(formData);
+    setShowInsuranceFields(!!formData.insuranceCheckbox);
   }, [formData, form]);
-
-  const handleValuesChange = (_: any, allValues: any) => {
-    setFormData((prev: any) => ({
-      ...prev,
-      ...allValues,
-    }));
-    setShowInsuranceFields(!!allValues.insuranceCheckbox);
-  };
 
   const handleInsuranceDocumentFileUpload =
     (index: number) =>
@@ -46,20 +44,26 @@ const KycDetails: React.FC<ProfileSetupProps> = ({
       reader.onload = () => {
         const base64String = reader.result as string;
 
-        const updatedInsurance = [...(form.getFieldValue("insurance") || [])];
-        updatedInsurance[index] = {
-          ...updatedInsurance[index],
-          insurance_document: base64String,
-        };
+        try {
+          const encrypted = encryptBase64(base64String, SECRET_KEY);
 
-        form.setFieldsValue({ insurance: updatedInsurance });
+          const updatedInsurance = [...(form.getFieldValue("insurance") || [])];
+          updatedInsurance[index] = {
+            ...updatedInsurance[index],
+            insurance_document: encrypted,
+          };
 
-        setFormData((prev: any) => ({
-          ...prev,
-          insurance: updatedInsurance,
-        }));
+          form.setFieldValue("insurance", updatedInsurance);
+          setFormData((prev: any) => ({
+            ...prev,
+            insurance: updatedInsurance,
+          }));
 
-        onSuccess?.("ok");
+          onSuccess?.("ok");
+        } catch (err) {
+          console.error("Encryption failed:", err);
+          message.error("Failed to encrypt file");
+        }
       };
 
       reader.onerror = () => {
@@ -68,15 +72,34 @@ const KycDetails: React.FC<ProfileSetupProps> = ({
 
       reader.readAsDataURL(file);
     };
+
+  const decryptDocument = (encrypted: EncryptedResult) =>
+    decryptBase64(encrypted.data, encrypted.iv, SECRET_KEY);
+
   return (
     <Form
       form={form}
       layout="vertical"
-      onValuesChange={handleValuesChange}
+      onValuesChange={(_, allValues) =>
+        setFormData((prev: any) => ({ ...prev, ...allValues }))
+      }
       initialValues={formData}
     >
       <Form.Item name="insuranceCheckbox" valuePropName="checked">
-        <Checkbox>Do you have insurance coverage?</Checkbox>
+        <Checkbox
+          onChange={(e) => {
+            setShowInsuranceFields(e.target.checked);
+            if (!e.target.checked) {
+              form.setFieldValue("insurance", []);
+              setFormData((prev: any) => ({
+                ...prev,
+                insurance: [],
+              }));
+            }
+          }}
+        >
+          Do you have insurance coverage?
+        </Checkbox>
       </Form.Item>
 
       {showInsuranceFields && (
@@ -119,36 +142,82 @@ const KycDetails: React.FC<ProfileSetupProps> = ({
                     </Col>
 
                     <Col span={24}>
-                      <Form.Item label="Insurance Document">
-                        {form.getFieldValue([
-                          "insurance",
-                          index,
-                          "insurance_document",
-                        ]) ? (
-                          <img
-                            src={form.getFieldValue([
+                      {/* Corrected name path */}
+                      <Form.Item
+                        name={[name, "insurance_document"]}
+                        label="Insurance Document"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please upload an insurance document",
+                          },
+                        ]}
+                      >
+                        <div>
+                          {(() => {
+                            const encrypted = form.getFieldValue([
                               "insurance",
                               index,
                               "insurance_document",
-                            ])}
-                            alt="Insurance Document"
-                            style={{
-                              maxWidth: "100%",
-                              maxHeight: "150px",
-                              marginBottom: 8,
-                            }}
-                          />
-                        ) : (
-                          <p>No document uploaded</p>
-                        )}
-                        <FileUploader
-                          name="file"
-                          multiple={false}
-                          customRequest={handleInsuranceDocumentFileUpload(
-                            index
-                          )}
-                          maxCount={1}
-                        />
+                            ]) as EncryptedResult;
+                            let decrypted: any | undefined;
+                            if (encrypted?.data && encrypted?.iv) {
+                              try {
+                                decrypted = decryptDocument(encrypted);
+                              } catch (err) {
+                                console.error("Decryption failed:", err);
+                              }
+                            }
+                            return (
+                              <>
+                                {decrypted ? (
+                                  decrypted.startsWith(
+                                    "data:application/pdf"
+                                  ) ? (
+                                    <PrimaryButton
+                                      style={{ margin: 10 }}
+                                      onClick={() => {
+                                        const win = window.open();
+                                        if (win) {
+                                          win.document.write(
+                                            `<iframe src="${decrypted}" frameborder="0" style="width:100%;height:100vh;" allowfullscreen></iframe>`
+                                          );
+                                        }
+                                      }}
+                                    >
+                                      View PDF Document
+                                    </PrimaryButton>
+                                  ) : (
+                                    <img
+                                      src={decrypted}
+                                      alt="Degree Document"
+                                      style={{
+                                        maxWidth: "100%",
+                                        maxHeight: 150,
+                                        marginBottom: 8,
+                                        padding: 10,
+                                        border: "1px solid #ccc",
+                                      }}
+                                    />
+                                  )
+                                ) : (
+                                  <div className="text-gray-400">
+                                    No document uploaded
+                                  </div>
+                                )}
+
+                                <FileUploader
+                                  name="file"
+                                  multiple={false}
+                                  customRequest={handleInsuranceDocumentFileUpload(
+                                    index
+                                  )}
+                                  maxCount={1}
+                                />
+                              </>
+                            );
+                          })()}
+                        </div>
                       </Form.Item>
                     </Col>
                   </Row>

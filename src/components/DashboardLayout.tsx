@@ -17,6 +17,7 @@ import { Header } from "./Header";
 import { LogoutButton } from "./LogoutButton";
 import logo from "../assets/logo.png";
 import { userProfile } from "../hooks/userProfile";
+import { decryptBase64, SECRET_KEY } from "../helper/Crypto";
 
 interface Props {
   role: "admin" | "doctor" | "patient";
@@ -99,6 +100,15 @@ export const DashboardLayout: React.FC<Props> = ({ role }) => {
     setOpenMenus((prev) => ({ ...prev, [label]: !prev[label] }));
   };
 
+  const profileImage = profile?.data?.profile_image as
+    | { data: string; iv: string }
+    | undefined;
+
+  // Decrypt profile image if available
+  const decryptedProfileImage = profileImage
+    ? decryptBase64(profileImage.data, profileImage.iv, SECRET_KEY)
+    : null;
+
   return (
     <div className="dashboard-layout">
       <aside className="sidebar">
@@ -116,7 +126,7 @@ export const DashboardLayout: React.FC<Props> = ({ role }) => {
             <div className="avatar-container">
               <Avatar
                 size={64}
-                src={profile.data.profile_image || "/default-avatar.png"}
+                src={decryptedProfileImage || "/default-avatar.png"}
                 icon={<UserOutlined />}
               />
             </div>
@@ -171,15 +181,6 @@ export const DashboardLayout: React.FC<Props> = ({ role }) => {
         </nav>
 
         <div className="sidebar-bottom">
-          {/* <div className="emergency-contact-card">
-            <h4>Emergency Contact</h4>
-            <p>
-              <PhoneOutlined
-                style={{ marginRight: '8px', color: 'var(--color-success)' }}
-              />
-              0987654321
-            </p>
-          </div> */}
           <div className="logout-container">
             <LogoutButton />
             <strong style={{ marginTop: "10px", display: "block" }}>

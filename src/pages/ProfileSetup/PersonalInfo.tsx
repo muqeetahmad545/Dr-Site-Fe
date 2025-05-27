@@ -4,6 +4,14 @@ import { UploadOutlined, UserOutlined } from "@ant-design/icons";
 import { PrimaryButton } from "../../components/PrimaryButton";
 import type { ProfileSetupProps } from "../../types/profile";
 import FileUploader from "../../components/FileUploader";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
+import {
+  decryptBase64,
+  encryptBase64,
+  SECRET_KEY,
+  type EncryptedResult,
+} from "../../helper/Crypto";
 
 const PersonalInfo: React.FC<ProfileSetupProps> = ({
   form,
@@ -12,181 +20,112 @@ const PersonalInfo: React.FC<ProfileSetupProps> = ({
 }) => {
   const { Option } = Select;
 
-  // const [form] = Form.useForm();
-  const [profileImage, setProfileImage] = useState<string | null>(
+  const [addressDocument, setAddressDocument] =
+    useState<EncryptedResult | null>(formData.address_document || null);
+
+  const [profileImage, setProfileImage] = useState<EncryptedResult | null>(
     formData.profile_image || null
   );
 
-  const [address_document, setAddress_document] = useState<string | null>(
-    formData.address_document || null
-  );
-  console.log("address_document", address_document);
   useEffect(() => {
     form.setFieldsValue(formData);
-    setProfileImage(formData.profile_image || null);
+    if (formData.profile_image) {
+      setProfileImage(formData.profile_image);
+    }
+    if (formData.address_document) {
+      setAddressDocument(formData.address_document);
+    }
   }, [formData, form]);
 
-  // const handleAvatarUpload = ({ file, onSuccess }: any) => {
-  //   const isImage = file.type.startsWith("image/");
-  //   if (!isImage) {
-  //     message.error("Only image files are allowed!");
-  //     return;
-  //   }
+  const onValuesChange = (allValues: any) => {
+    setFormData((prev: any) => ({ ...prev, ...allValues }));
+  };
 
-  //   const reader = new FileReader();
-  //   reader.onload = () => {
-  //     const base64 = reader.result as string;
-  //     setImageUrl(base64);
-  //     setFormData((prev: any) => ({ ...prev, avatar: base64 }));
-  //     onSuccess?.("ok");
-  //   };
-  //   reader.readAsDataURL(file);
-  // };
-  // const handleAvatarUpload = async ({ file, onSuccess }: any) => {
-  //   const isImage = file.type.startsWith("image/");
-  //   if (!isImage) {
-  //     message.error("Only image files are allowed!");
-  //     return;
-  //   }
-
-  //   const formData = new FormData();
-  //   formData.append("file", file);
-
-  //   try {
-  //     const response = await uploadFile(formData).unwrap();
-  //     const imageUrl = response.url; // Assuming response contains the URL
-  //     setImageUrl(imageUrl);
-  //     setFormData((prev: any) => ({ ...prev, avatar: imageUrl }));
-  //     onSuccess?.("ok");
-  //   } catch (error) {
-  //     message.error("File upload failed!");
-  //     console.error(error);
-  //   }
-  // };
+  const readFileAsBase64 = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
 
   const handleAvatarUpload = async ({ file, onSuccess }: any) => {
-    const isImage = file.type.startsWith("image/");
-    console.log("Uploaded file type:", file.type); // Log file type
-    if (!isImage) {
+    if (!file.type.startsWith("image/")) {
       message.error("Only image files are allowed!");
       return;
     }
-
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      const base64String = reader.result as string;
-
-      console.log("Base64 image string:", base64String); // Log base64 image string
-
-      setProfileImage(base64String);
-      form.setFieldsValue({ profile_image: base64String });
-      setFormData((prev: any) => ({
-        ...prev,
-        profile_image: base64String,
-      }));
+    try {
+      const base64String = await readFileAsBase64(file);
+      console.log("base64String", base64String);
+      const encrypted = encryptBase64(base64String, SECRET_KEY);
+      setProfileImage(encrypted);
+      form.setFieldsValue({ profile_image: encrypted });
+      console.log("encrypted", encrypted);
+      console.log("profile_image", form.setFieldsValue.profile_image);
+      setFormData((prev: any) => ({ ...prev, profile_image: encrypted }));
 
       onSuccess?.("ok");
-    };
-    console.log("Payload before sending:", formData);
-
-    reader.onerror = () => {
-      console.error("Error reading the file"); // Log error
+    } catch (error) {
       message.error("Failed to read image file");
-    };
-
-    reader.readAsDataURL(file);
+    }
   };
 
-  // const handleAddresDocomentFileUpload =
-  //   (name: string) =>
-  //   ({ file, onSuccess }: any) => {
-  //     const isFile =
-  //       file.type.startsWith("application/") || file.type.startsWith("image/");
-
-  //     // const isFile = file.type.startsWith("application/"); // Adjust as needed (for documents)
-  //     if (!isFile) {
-  //       message.error("Only document files are allowed!");
-  //       return;
-  //     }
-
-  //     const reader = new FileReader();
-  //     reader.onload = () => {
-  //       const base64 = reader.result as string;
-  //       setAddress_document(base64);
-  //       setFormData((prev: any) => ({
-  //         ...prev,
-  //         address_document: base64, // Save Base64 string in formData
-  //       }));
-  //       onSuccess?.("ok");
-  //     };
-  //     reader.readAsDataURL(file);
-  //   };
-
-  const handleValuesChange = (_: any, allValues: any) => {
-    setFormData((prev: any) => ({
-      ...prev,
-      ...allValues,
-    }));
-  };
-
-  const handleAddresDocomentFileUpload = async ({ file, onSuccess }: any) => {
+  const handleAddressDocumentUpload = async ({ file, onSuccess }: any) => {
     if (!file) {
       message.error("No file selected");
       return;
     }
 
-    const isValidFile =
-      file.type.startsWith("application/") || file.type.startsWith("image/");
-
-    if (!isValidFile) {
+    if (
+      !(file.type.startsWith("application/") || file.type.startsWith("image/"))
+    ) {
       message.error("Only document or image files are allowed!");
       return;
     }
 
-    const reader = new FileReader();
+    try {
+      const base64String = await readFileAsBase64(file);
+      const encrypted = encryptBase64(base64String, SECRET_KEY);
 
-    reader.onload = () => {
-      const base64String = reader.result as string;
-      setAddress_document(base64String);
+      setAddressDocument(encrypted);
+      form.setFieldsValue({ address_document: encrypted });
       setFormData((prev: any) => ({
         ...prev,
-        address_document: base64String,
+        address_document: encrypted,
       }));
 
-      console.log("address_document", address_document);
-
       onSuccess?.("ok");
-    };
-
-    reader.onerror = () => {
-      message.error("Failed to read file");
-    };
-
-    reader.readAsDataURL(file);
+    } catch (error) {
+      message.error("Failed to process file");
+    }
   };
 
+  const decryptDocument = (encrypted: EncryptedResult) =>
+    decryptBase64(encrypted.data, encrypted.iv, SECRET_KEY);
+
+  const decryptedProfileImage = profileImage
+    ? decryptBase64(profileImage.data, profileImage.iv, SECRET_KEY)
+    : null;
+
   return (
-    <Form
-      form={form}
-      layout="vertical"
-      onValuesChange={handleValuesChange}
-      initialValues={formData}
-    >
-      <div className="user-info">
+    <Form form={form} layout="vertical" onValuesChange={onValuesChange}>
+      <div className="user-info" style={{ marginBottom: 24 }}>
         <Avatar
           size={100}
-          src={profileImage || undefined}
+          src={
+            decryptedProfileImage?.startsWith("data:image/")
+              ? decryptedProfileImage
+              : undefined
+          }
           icon={<UserOutlined />}
           style={{ marginBottom: 8 }}
         />
+
         <Upload
           showUploadList={false}
           beforeUpload={(file) => {
             const isImage = file.type.startsWith("image/");
-            if (!isImage) {
-              message.error("Only image files are allowed!");
-            }
+            if (!isImage) message.error("Only image files are allowed!");
             return isImage;
           }}
           customRequest={handleAvatarUpload}
@@ -196,7 +135,7 @@ const PersonalInfo: React.FC<ProfileSetupProps> = ({
           </PrimaryButton>
         </Upload>
       </div>
-
+      {/* Personal info fields */}
       <Row gutter={16}>
         <Col span={12}>
           <Form.Item
@@ -217,7 +156,6 @@ const PersonalInfo: React.FC<ProfileSetupProps> = ({
           </Form.Item>
         </Col>
       </Row>
-
       <Row gutter={16}>
         <Col span={12}>
           <Form.Item
@@ -225,7 +163,7 @@ const PersonalInfo: React.FC<ProfileSetupProps> = ({
             name="email"
             rules={[{ required: true, type: "email" }]}
           >
-            <Input autoComplete="email" />
+            <Input autoComplete="email" readOnly />
           </Form.Item>
         </Col>
         <Col span={12}>
@@ -234,24 +172,31 @@ const PersonalInfo: React.FC<ProfileSetupProps> = ({
             name="phone"
             rules={[{ required: true }]}
           >
-            <Input />
+            <PhoneInput
+              country="pk"
+              // Use form.getFieldValue to set value to keep in sync
+              value={form.getFieldValue("phone")}
+              onChange={(phone) => {
+                form.setFieldsValue({ phone });
+                setFormData((prev: any) => ({ ...prev, phone }));
+              }}
+              inputStyle={{ width: "100%" }}
+            />
           </Form.Item>
         </Col>
       </Row>
-
       <Row gutter={16}>
         <Col span={12}>
-          <Form.Item label="Address" name="address">
+          <Form.Item
+            label="Address"
+            name="address"
+            rules={[{ required: true }]}
+          >
             <Input />
           </Form.Item>
         </Col>
         <Col span={12}>
-          <Form.Item
-            label="Gender"
-            name="gender"
-            initialValue="male"
-            rules={[{ required: true }]}
-          >
+          <Form.Item label="Gender" name="gender" rules={[{ required: true }]}>
             <Select placeholder="Select gender">
               <Option value="male">Male</Option>
               <Option value="female">Female</Option>
@@ -260,15 +205,9 @@ const PersonalInfo: React.FC<ProfileSetupProps> = ({
           </Form.Item>
         </Col>
       </Row>
-
       <Row gutter={16}>
         <Col span={12}>
-          <Form.Item
-            label="Status"
-            name="status"
-            initialValue="active"
-            rules={[{ required: true }]}
-          >
+          <Form.Item label="Status" name="status" rules={[{ required: true }]}>
             <Select placeholder="Select status">
               <Option value="active">Active</Option>
               <Option value="inActive">InActive</Option>
@@ -283,35 +222,52 @@ const PersonalInfo: React.FC<ProfileSetupProps> = ({
       </Row>
       <Row gutter={16}>
         <Col span={24}>
-          {/* <Form.Item
-            label="Address Document"
-            // rules={[{ required: true, message: "Upload address document" }]}
-          >
-            <FileUploader
-              name="file"
-              multiple={false}
-              customRequest={handleAddresDocomentFileUpload}
-              maxCount={1}
-            />
-          </Form.Item> */}
           <Form.Item label="Address Document">
-            {address_document ? (
-              <img
-                src={address_document}
-                alt="Address Document"
-                style={{
-                  maxWidth: "100%",
-                  maxHeight: "150px",
-                  marginBottom: 8,
-                }}
-              />
+            {addressDocument ? (
+              (() => {
+                const decryptedData = decryptDocument(addressDocument);
+                if (!decryptedData) return <p>Failed to decrypt document</p>;
+
+                if (decryptedData.startsWith("data:application/pdf")) {
+                  return (
+                    <PrimaryButton
+                      style={{ margin: 10 }}
+                      onClick={() => {
+                        const win = window.open();
+                        if (win) {
+                          win.document.write(
+                            `<iframe src="${decryptedData}" frameborder="0" style="width:100%;height:100vh;" allowfullscreen></iframe>`
+                          );
+                        }
+                      }}
+                    >
+                      View PDF Document
+                    </PrimaryButton>
+                  );
+                } else {
+                  return (
+                    <img
+                      src={decryptedData}
+                      alt="Address Document"
+                      style={{
+                        maxWidth: "100%",
+                        maxHeight: 150,
+                        marginBottom: 8,
+                        padding: 10,
+                        border: "1px solid #ccc",
+                      }}
+                    />
+                  );
+                }
+              })()
             ) : (
               <p>No document uploaded</p>
             )}
+
             <FileUploader
               name="file"
               multiple={false}
-              customRequest={handleAddresDocomentFileUpload}
+              customRequest={handleAddressDocumentUpload}
               maxCount={1}
             />
           </Form.Item>

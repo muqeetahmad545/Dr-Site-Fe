@@ -4,18 +4,22 @@ import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import type { ProfileSetupProps } from "../../types/profile";
 import { PrimaryButton } from "../../components/PrimaryButton";
 import FileUploader from "../../components/FileUploader";
+import {
+  decryptBase64,
+  encryptBase64,
+  SECRET_KEY,
+  type EncryptedResult,
+} from "../../helper/Crypto";
 
 const EducationDetails: React.FC<ProfileSetupProps> = ({
   form,
   formData,
   setFormData,
 }) => {
-  // Sync form with incoming formData
   useEffect(() => {
     form.setFieldsValue(formData);
   }, [formData, form]);
 
-  // Upload handler that works per index in the education list
   const handleEducationDocumentFileUpload =
     (index: number) =>
     async ({ file, onSuccess }: any) => {
@@ -35,19 +39,25 @@ const EducationDetails: React.FC<ProfileSetupProps> = ({
       reader.onload = () => {
         const base64String = reader.result as string;
 
-        const updatedEducation = [...(form.getFieldValue("education") || [])];
-        updatedEducation[index] = {
-          ...updatedEducation[index],
-          degree_document: base64String,
-        };
+        try {
+          const encrypted = encryptBase64(base64String, SECRET_KEY);
 
-        form.setFieldValue("education", updatedEducation);
-        setFormData((prev: any) => ({
-          ...prev,
-          education: updatedEducation,
-        }));
+          const updatedEducation = [...(form.getFieldValue("education") || [])];
+          updatedEducation[index] = {
+            ...updatedEducation[index],
+            degree_document: encrypted,
+          };
 
-        onSuccess?.("ok");
+          form.setFieldValue("education", updatedEducation);
+          setFormData((prev: any) => ({
+            ...prev,
+            education: updatedEducation,
+          }));
+          onSuccess?.("ok");
+        } catch (err) {
+          console.error("Encryption failed:", err);
+          message.error("Failed to encrypt file");
+        }
       };
 
       reader.onerror = () => {
@@ -57,6 +67,8 @@ const EducationDetails: React.FC<ProfileSetupProps> = ({
       reader.readAsDataURL(file);
     };
 
+  const decryptDocument = (encrypted: EncryptedResult) =>
+    decryptBase64(encrypted.data, encrypted.iv, SECRET_KEY);
   return (
     <Form
       form={form}
@@ -107,30 +119,77 @@ const EducationDetails: React.FC<ProfileSetupProps> = ({
                           <Input placeholder="e.g., King Edward" />
                         </Form.Item>
                       </Col>
+
                       <Col span={24}>
-                        <Form.Item label="Degree Document">
-                          {/* Check if the degree_document is available and show the image */}
-                          {form.getFieldValue([
-                            "education",
-                            index,
-                            "degree_document",
-                          ]) ? (
-                            <img
-                              src={form.getFieldValue([
-                                "education",
-                                index,
-                                "degree_document",
-                              ])}
-                              alt="Degree Document"
-                              style={{
-                                maxWidth: "100%",
-                                maxHeight: "150px",
-                                marginBottom: 8,
-                              }}
-                            />
-                          ) : (
-                            <p>No document uploaded</p>
-                          )}
+                        <Form.Item
+                          name={[name, "degree_document"]}
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please upload the degree document",
+                            },
+                          ]}
+                          style={{ display: "none" }}
+                        >
+                          <Input />
+                        </Form.Item>
+
+                        <Form.Item label="Degree Document" required>
+                          {(() => {
+                            const encrypted = form.getFieldValue([
+                              "education",
+                              index,
+                              "degree_document",
+                            ]) as EncryptedResult;
+
+                            let decrypted: any | undefined;
+                            if (encrypted?.data && encrypted?.iv) {
+                              try {
+                                decrypted = decryptDocument(encrypted);
+                              } catch (err) {
+                                console.error("Decryption failed:", err);
+                              }
+                            }
+
+                            if (encrypted && decrypted) {
+                              if (
+                                decrypted.startsWith("data:application/pdf")
+                              ) {
+                                return (
+                                  <PrimaryButton
+                                    style={{ margin: 10 }}
+                                    onClick={() => {
+                                      const win = window.open();
+                                      if (win) {
+                                        win.document.write(
+                                          `<iframe src="${decrypted}" frameborder="0" style="width:100%;height:100vh;" allowfullscreen></iframe>`
+                                        );
+                                      }
+                                    }}
+                                  >
+                                    View PDF Document
+                                  </PrimaryButton>
+                                );
+                              } else {
+                                return (
+                                  <img
+                                    src={decrypted}
+                                    alt="Degree Document"
+                                    style={{
+                                      maxWidth: "100%",
+                                      maxHeight: 150,
+                                      marginBottom: 8,
+                                      padding: 10,
+                                      border: "1px solid #ccc",
+                                    }}
+                                  />
+                                );
+                              }
+                            } else {
+                              return <p>No document uploaded</p>;
+                            }
+                          })()}
+
                           <FileUploader
                             name="file"
                             multiple={false}
@@ -141,6 +200,7 @@ const EducationDetails: React.FC<ProfileSetupProps> = ({
                           />
                         </Form.Item>
                       </Col>
+
                       <Col
                         span={4}
                         style={{ display: "flex", alignItems: "center" }}
