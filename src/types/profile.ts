@@ -18,6 +18,7 @@ export interface Profile {
     imc?: string;
     specialization?: string;
     available_days?: string[];
+    doctor_availabilities?: string[];
     available_times?: string[];
 
     education?: {

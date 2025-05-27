@@ -79,10 +79,10 @@ const Appointments = () => {
   //   });
   // };
 
-    if (isLoading) {
-      return <LoadingSpinner />;
-    }
-    // if (isError) return <p>Error fetching doctors.</p>;
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+  // if (isError) return <p>Error fetching doctors.</p>;
 
   return (
     <div>
@@ -142,7 +142,7 @@ const Appointments = () => {
               hoverable
               cover={
                 <img
-                  alt={'img'}
+                  alt={"img"}
                   src={DrSmithImg}
                   className="doctor-image"
                   style={{ height: "200px", objectFit: "cover", width: "100%" }}
@@ -180,8 +180,8 @@ const Appointments = () => {
                 {doctor?.doctor?.work_history || "Not available"}
                 <br />
                 <strong>Available Days:</strong>{" "}
-                {doctor?.doctor?.available_days
-                  ? JSON.parse(doctor?.doctor?.available_days).join(", ")
+                {doctor?.doctor?.doctor_availabilities
+                  ? JSON.parse(doctor?.doctor?.doctor_availabilities).join(", ")
                   : "Not available"}
                 <br />
                 <strong>Available Times:</strong>{" "}
