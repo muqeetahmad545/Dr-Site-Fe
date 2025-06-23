@@ -30,6 +30,11 @@ import DoctorSetting from "./pages/doctor/Settings";
 import { Verification } from "./pages/Verification";
 import PatientLogin from "./pages/PatientLogin";
 import ProfileSetup from "./pages/ProfileSetup";
+import Admin from "./pages/superAdmin/admin";
+import AddAdmin from "./pages/superAdmin/addAdmin";
+import SuperAdminDashboard from "./pages/superAdmin/SuperAdminDashboard";
+import { SuperAdminLayout } from "./pages/superAdmin/AdminLayout";
+import CallRoom from "./pages/doctor/CallRoom";
 function App() {
   const getUser = () => {
     const user = localStorage.getItem("user");
@@ -71,6 +76,21 @@ function App() {
       <Route path="/forgot-password" element={<ForgetPassword />} />
       <Route path="/verification" element={<Verification />} />
       <Route path="/patient-login" element={<PatientLogin />} />
+      <Route path="/meeting" element={<CallRoom />} />
+
+      <Route
+        path="/SuperAdmin"
+        element={
+          <ProtectedRoute role="SuperAdmin">
+            <SuperAdminLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="add-admin" element={<AddAdmin />} />
+        <Route path="edit-admin/:id" element={<AddAdmin />} />
+        <Route path="admin" element={<Admin />} />
+        <Route path="dashboard" element={<SuperAdminDashboard />} />
+      </Route>
 
       <Route
         path="/admin"

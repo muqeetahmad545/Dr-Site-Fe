@@ -7,7 +7,7 @@ const getCurrentUser = () => {
 };
 
 type Props = {
-  role: "admin" | "doctor" | "patient";
+  role: "admin" | "doctor" | "patient" | "SuperAdmin";
   children: JSX.Element;
 };
 

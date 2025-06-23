@@ -37,6 +37,7 @@ export const Header: React.FC<HeaderProps> = ({ title = "Dr Site" }) => {
       <div className="profile-info">
         <div>
           <Avatar
+            src={decryptedProfileImage}
             onClick={() => handelOpenProfie()}
             size={40}
             icon={<UserOutlined />}

@@ -1,7 +1,7 @@
-import DashboardLayout from '../../components/DashboardLayout';
+import SideBarLayout from "../../components/SideBarLayout";
 
 const DoctorLayout = () => {
-  return <DashboardLayout role="doctor" />;
+  return <SideBarLayout role="doctor" />;
 };
 
 export default DoctorLayout;

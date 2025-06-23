@@ -1,4 +1,4 @@
-import DashboardLayout from '../../components/DashboardLayout';
+import SideBarLayout from "../../components/SideBarLayout";
 export const AdminLayout = () => {
-  return <DashboardLayout role="admin" />;
+  return <SideBarLayout role="admin" />;
 };

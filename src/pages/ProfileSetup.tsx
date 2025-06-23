@@ -209,7 +209,7 @@ const ProfileSetup: React.FC = () => {
 
       const response = await updateProfile(payload).unwrap();
       message.success(response.message);
-      navigate("/login");
+      navigate("/doctor/dashboard");
     } catch (err: any) {
       console.log("err", err);
       const errorMessage =

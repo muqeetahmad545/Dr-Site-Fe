@@ -9,7 +9,6 @@ import {
   ProfileOutlined,
   UserOutlined,
   MedicineBoxOutlined,
-  // PhoneOutlined,
   DownOutlined,
 } from "@ant-design/icons";
 import { Avatar } from "antd";
@@ -20,7 +19,7 @@ import { userProfile } from "../hooks/userProfile";
 import { decryptBase64, SECRET_KEY } from "../helper/Crypto";
 
 interface Props {
-  role: "admin" | "doctor" | "patient";
+  role: "admin" | "doctor" | "patient" | "SuperAdmin";
 }
 
 interface NavLinkItem {
@@ -30,7 +29,7 @@ interface NavLinkItem {
   children?: NavLinkItem[];
 }
 
-export const DashboardLayout: React.FC<Props> = ({ role }) => {
+export const SideBarLayout: React.FC<Props> = ({ role }) => {
   const { data: profile } = userProfile();
   const location = useLocation();
   const [openMenus, setOpenMenus] = useState<{ [label: string]: boolean }>({});
@@ -48,11 +47,26 @@ export const DashboardLayout: React.FC<Props> = ({ role }) => {
     addPatient: "Add Patient",
     "health-overview": "Health Overview",
     "all-appointments": "Appointments List",
+    admin: "Admin",
+    "add-admin": "Add Admin",
+    "edit-admin": "Edit Admin",
   };
 
   const title = titles[route || "dashboard"];
 
-  const links: Record<"admin" | "doctor" | "patient", NavLinkItem[]> = {
+  const links: Record<
+    "admin" | "doctor" | "patient" | "SuperAdmin",
+    NavLinkItem[]
+  > = {
+    SuperAdmin: [
+      // { to: "add-admin", label: "Dashboard", icon: <DashboardOutlined /> },
+      {
+        to: "dashboard",
+        label: "Dashboard",
+        icon: <TeamOutlined />,
+      },
+      { to: "admin", label: "Admin", icon: <TeamOutlined /> },
+    ],
     admin: [
       { to: "dashboard", label: "Dashboard", icon: <DashboardOutlined /> },
       {
@@ -63,14 +77,14 @@ export const DashboardLayout: React.FC<Props> = ({ role }) => {
           // { to: "add-doctor", label: "Add Doctor" },
         ],
       },
-      {
-        label: "Patients",
-        icon: <TeamOutlined />,
-        children: [
-          { to: "patients", label: "Patient List" },
-          // { to: "add-patient", label: "Add Patient" },
-        ],
-      },
+      // {
+      //   label: "Patients",
+      //   icon: <TeamOutlined />,
+      //   children: [
+      //     { to: "patients", label: "Patient List" },
+      //     // { to: "add-patient", label: "Add Patient" },
+      //   ],
+      // },
       {
         to: "all-appointments",
         label: "Appointments",
@@ -100,14 +114,17 @@ export const DashboardLayout: React.FC<Props> = ({ role }) => {
     setOpenMenus((prev) => ({ ...prev, [label]: !prev[label] }));
   };
 
+  const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
   const profileImage = profile?.data?.profile_image as
     | { data: string; iv: string }
     | undefined;
 
-  // Decrypt profile image if available
   const decryptedProfileImage = profileImage
     ? decryptBase64(profileImage.data, profileImage.iv, SECRET_KEY)
     : null;
+
+  if (!links[role]) return <div>Unauthorized role</div>;
 
   return (
     <div className="dashboard-layout">
@@ -117,21 +134,19 @@ export const DashboardLayout: React.FC<Props> = ({ role }) => {
           <strong>Cliniva</strong>
         </div>
 
-        <h2 className="panel-title">
-          {role.charAt(0).toUpperCase() + role.slice(1)} Panel
-        </h2>
+        <h2 className="panel-title">{capitalize(role)} Panel</h2>
 
         {profile && (
           <div className="user-info">
             <div className="avatar-container">
               <Avatar
                 size={64}
-                src={decryptedProfileImage || "/default-avatar.png"}
-                icon={<UserOutlined />}
+                src={decryptedProfileImage || undefined}
+                icon={!decryptedProfileImage && <UserOutlined />}
               />
             </div>
-            <div className="user-name">{profile.data.first_name || "Jhon"}</div>
-            <div className="user-role"> {role.toUpperCase()} </div>
+            <div className="user-name">{profile.data.first_name || "John"}</div>
+            <div className="user-role">{role.toUpperCase()}</div>
           </div>
         )}
 
@@ -200,4 +215,4 @@ export const DashboardLayout: React.FC<Props> = ({ role }) => {
   );
 };
 
-export default DashboardLayout;
+export default SideBarLayout;

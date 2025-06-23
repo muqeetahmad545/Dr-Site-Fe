@@ -10,12 +10,12 @@ import { userProfile } from "../../hooks/userProfile";
 
 const AllDoctors: React.FC = () => {
   const navigate = useNavigate();
-const { data: profile, refetch } = userProfile();
+  const { data: profile, refetch } = userProfile();
   const { data: doctorsData, isLoading } = useGetDoctorsQuery();
   const [doctorList, setDoctorList] = useState<Doctor[]>([]);
-useEffect(() => {
-  refetch(); 
-}, [refetch]);
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
   const isProfileComplete = (profile: any) => {
     return (
       profile?.data.first_name &&
@@ -69,11 +69,21 @@ useEffect(() => {
     {
       title: "Name",
       render: (_: any, record: Doctor) =>
-        `${record.first_name} ${record.last_name}`,
+        record.first_name || record.last_name
+          ? `${record.first_name ?? ""} ${record.last_name ?? ""}`.trim()
+          : "N/A",
     },
     { title: "Email", dataIndex: "email" },
-    { title: "Phone", dataIndex: "phone" },
-    { title: "Gender", dataIndex: "gender" },
+    {
+      title: "Phone",
+      dataIndex: "phone",
+      render: (text: any) => (text ? text : "N/A"),
+    },
+    {
+      title: "Gender",
+      dataIndex: "gender",
+      render: (text: any) => (text ? text : "N/A"),
+    },
     {
       title: "Status",
       dataIndex: "status",
