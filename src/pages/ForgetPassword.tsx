@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { PrimaryButton } from "../components/PrimaryButton";
 import { AuthLayout } from "../components/AuthLayout";
-import { useForgotPasswordMutation } from "../features/api/auth/authAPI";
+import { useForgotPasswordMutation } from "../features/api/auth/authApi";
 import type { APIError } from "../types/error";
 const { Title } = Typography;
 

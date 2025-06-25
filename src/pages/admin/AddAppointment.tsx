@@ -1,6 +1,6 @@
 // src/pages/admin/RegisterAppointments.tsx
 import React, { useState } from "react";
-import { Card, Form, Input,Select, message, Radio } from "antd";
+import { Card, Form, Input, Select, message, Radio } from "antd";
 import { PrimaryButton } from "../../components/PrimaryButton";
 import { useNavigate, useParams } from "react-router-dom";
 import type { Appointment } from "../../types/appointment";
@@ -32,10 +32,10 @@ const { Option } = Select;
 
 const AddAppointment: React.FC = () => {
   const doctorOptions = [
-  { label: "Dr. John Smith", value: "john" },
-  { label: "Dr. Jane Doe", value: "jane" },
-  { label: "Dr. Ahmed Ali", value: "ahmed" },
-];
+    { label: "Dr. John Smith", value: "john" },
+    { label: "Dr. Jane Doe", value: "jane" },
+    { label: "Dr. Ahmed Ali", value: "ahmed" },
+  ];
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const navigate = useNavigate();
@@ -52,7 +52,9 @@ const AddAppointment: React.FC = () => {
   const handleFinish = (values: Appointment) => {
     setLoading(true);
     console.log(isEdit ? "Updated Appointment:" : "Added Appointment:", values);
-    message.success(`Appointment ${isEdit ? "updated" : "added"} successfully!`);
+    message.success(
+      `Appointment ${isEdit ? "updated" : "added"} successfully!`
+    );
     setLoading(false);
     navigate("/admin/appointment");
   };
@@ -79,19 +81,19 @@ const AddAppointment: React.FC = () => {
           <Input />
         </Form.Item>
 
-     <Form.Item
-  label="Consulting Doctor"
-  name="consultingDoctor"
-  rules={[{ required: true, message: "Please select a doctor!" }]}
->
-  <Select placeholder="Select a doctor">
-    {doctorOptions.map((doc) => (
-      <Option key={doc.value} value={doc.value}>
-        {doc.label}
-      </Option>
-    ))}
-  </Select>
-</Form.Item>
+        <Form.Item
+          label="Consulting Doctor"
+          name="consultingDoctor"
+          rules={[{ required: true, message: "Please select a doctor!" }]}
+        >
+          <Select placeholder="Select a doctor">
+            {doctorOptions.map((doc) => (
+              <Option key={doc.value} value={doc.value}>
+                {doc.label}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
 
         <Form.Item label="Address" name="address">
           <Input />
@@ -110,8 +112,8 @@ const AddAppointment: React.FC = () => {
 
         <Form.Item label="Blood Group" name="bloodGroup">
           <Input />
-        </Form.Item>   
-        
+        </Form.Item>
+
         <Form.Item label="Disease" name="disease">
           <Input />
         </Form.Item>

@@ -6,7 +6,7 @@ import { AuthLayout } from "../components/AuthLayout";
 // import { GoogleOutlined, FacebookFilled } from "@ant-design/icons";
 // import { auth, facebookProvider, googleProvider } from "../firebase";
 import { PrimaryButton } from "../components/PrimaryButton";
-import { useLoginMutation } from "../features/api/auth/authAPI";
+import { useLoginMutation } from "../features/api/auth/authApi";
 import type { APIError } from "../types/error";
 
 const { Title } = Typography;

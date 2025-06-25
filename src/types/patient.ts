@@ -10,5 +10,6 @@ export interface Patient {
   age?: string;
   bloodGroup?: string;
   condition?: string;
-  status?: string;     
+  status?: string;
+  user: any | string;
 }

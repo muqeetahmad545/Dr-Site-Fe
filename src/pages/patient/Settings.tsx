@@ -16,7 +16,7 @@ import { UploadOutlined, UserOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { userProfile } from "../../hooks/userProfile";
-import { useUpdateProfileMutation } from "../../features/api/auth/authAPI";
+import { useUpdateProfileMutation } from "../../features/api/auth/authApi";
 import dayjs from "dayjs";
 
 const PatientSetting: React.FC = () => {

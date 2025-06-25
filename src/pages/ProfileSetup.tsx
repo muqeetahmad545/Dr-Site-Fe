@@ -9,7 +9,7 @@ import {
   useGetProfileQuery,
   useUpdateProfileMutation,
   useVerifyTokenMutation,
-} from "../features/api/auth/authAPI";
+} from "../features/api/auth/authApi";
 import { useLocation, useNavigate } from "react-router-dom";
 import LoadingSpinner from "../components/LoadingSpinner";
 

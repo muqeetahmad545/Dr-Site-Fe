@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Table, Tag, Card, message } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { PrimaryButton } from "../../components/PrimaryButton";
+// import { PrimaryButton } from "../../components/PrimaryButton";
 import { useNavigate } from "react-router-dom";
-import { useGetDoctorsQuery } from "../../features/api/admin/adminAPi";
+import { useGetDoctorsQuery } from "../../features/api/admin/adminApi";
 import type { Doctor } from "../../types/doctor";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { userProfile } from "../../hooks/userProfile";
@@ -43,16 +43,16 @@ const AllDoctors: React.FC = () => {
     message.success("Doctor deleted successfully!");
   };
 
-  const handleAddDoctor = () => {
-    if (!isProfileComplete(profile)) {
-      message.warning(
-        "To proceed, please complete your profile information in settings."
-      );
-      navigate("/admin/settings");
-      return;
-    }
-    navigate("/admin/add-doctor");
-  };
+  // const handleAddDoctor = () => {
+  //   if (!isProfileComplete(profile)) {
+  //     message.warning(
+  //       "To proceed, please complete your profile information in settings."
+  //     );
+  //     navigate("/admin/settings");
+  //     return;
+  //   }
+  //   navigate("/admin/add-doctor");
+  // };
 
   const handelEditPatient = (id: any) => {
     if (!isProfileComplete(profile)) {
@@ -119,7 +119,7 @@ const AllDoctors: React.FC = () => {
       title={
         <div className="header-row">
           <span>Doctors</span>
-          <PrimaryButton onClick={handleAddDoctor}>Add Doctor</PrimaryButton>
+          {/* <PrimaryButton onClick={handleAddDoctor}>Add Doctor</PrimaryButton> */}
         </div>
       }
     >

@@ -41,10 +41,13 @@ const Availability: React.FC<ProfileSetupProps> = ({
     const endTime = dayjs(end, "HH:mm");
     const times: string[] = [];
     let current = startTime;
-    while (current.isBefore(endTime)) {
-      times.push(current.format("HH:mm"));
+
+    while (current.isBefore(endTime) || current.isSame(endTime)) {
+      const timeAMPM = current.format("hh:mm A");
+      times.push(timeAMPM);
       current = current.add(interval, "minute");
     }
+
     return times;
   };
 
@@ -60,11 +63,22 @@ const Availability: React.FC<ProfileSetupProps> = ({
   const addTimeSlotString = (day: string, timeStr: string) => {
     const current = availability[day] || [];
     if (!current.includes(timeStr)) {
-      const updated = [...current, timeStr].sort();
+      const updated = [...current, timeStr];
       const newAvailability = { ...availability, [day]: updated };
       updateAvailability(newAvailability);
     }
   };
+  useEffect(() => {
+    const cleaned = Object.fromEntries(
+      Object.entries(availability).map(([day, times]) => [
+        day,
+        Array.from(
+          new Set(times.filter((t) => t.includes("AM") || t.includes("PM")))
+        ),
+      ])
+    );
+    setAvailability(cleaned);
+  }, []);
 
   const removeTimeSlot = (day: string, time: string) => {
     const current = availability[day] || [];
@@ -161,10 +175,10 @@ const Availability: React.FC<ProfileSetupProps> = ({
 
         {selectedDays.map((day) => (
           <div key={day} className="mt-6 border-t pt-4">
-            <h3 className="text-lg font-semibold capitalize mb-2">{day}</h3>
+            <h3 className="text-lg font-semibold capitalize mb-2 ">{day}</h3>
 
             <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
-              {generateTimeSlots("00:00", "23:00", 30).map((time) => {
+              {generateTimeSlots("07:00", "22:30", 30).map((time) => {
                 const isSelected = availability[day]?.includes(time);
                 return (
                   <button
@@ -175,10 +189,10 @@ const Availability: React.FC<ProfileSetupProps> = ({
                         ? removeTimeSlot(day, time)
                         : addTimeSlotString(day, time)
                     }
-                    className={`text-sm rounded px-3 py-1 border font-medium transition ${
+                    className={`text-sm rounded px-3 py-1 border-[#5aac54] font-medium transition ${
                       isSelected
-                        ? "bg-blue-600 text-white border-blue-600"
-                        : "bg-white text-gray-700 border-gray-300 hover:bg-blue-50"
+                        ? "bg-[#5aac54] text-white border-blue-600"
+                        : "bg-white text-gray-700 border-gray-300 hover:[#5aac54]"
                     }`}
                   >
                     {time}

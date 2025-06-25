@@ -5,7 +5,7 @@ import { Pie } from "@ant-design/charts";
 import {
   useGetDoctorsQuery,
   useGetPatientsQuery,
-} from "../../features/api/admin/adminAPi";
+} from "../../features/api/admin/adminApi";
 import type { Doctor } from "../../types/doctor";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import type { Patient } from "../../types/patient";
@@ -15,9 +15,8 @@ const AdminDashboard: React.FC = () => {
   const { data: patientData } = useGetPatientsQuery();
   const [doctorList, setDoctorList] = useState<Doctor[]>([]);
   const [patientList, setPatientList] = useState<Patient[]>([]);
-  const activeDoctorCount = doctorList.filter(
-    (doc) => doc.status === "active"
-  ).length || 0;
+  const activeDoctorCount =
+    doctorList.filter((doc) => doc.status === "active").length || 0;
   const doctorCount = doctorList.length || 0;
   const patientCount = patientList.length || 0;
   useEffect(() => {
@@ -41,7 +40,7 @@ const AdminDashboard: React.FC = () => {
 
   const pieData = [
     { type: "Doctors", value: doctorCount },
-    { type: "Patients", value: patientCount  },
+    { type: "Patients", value: patientCount },
     { type: "Appointments", value: 10 },
   ];
 
@@ -53,7 +52,7 @@ const AdminDashboard: React.FC = () => {
   if (isLoading) {
     return <LoadingSpinner />;
   }
-// if (isError) return <div>Error loading dashboard data</div>;
+  // if (isError) return <div>Error loading dashboard data</div>;
   return (
     <div className="admin-dashboard">
       <Row gutter={16} style={{ marginBottom: 24 }}>

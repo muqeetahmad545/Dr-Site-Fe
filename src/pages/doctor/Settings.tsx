@@ -6,7 +6,7 @@ import { PrimaryButton } from "../../components/PrimaryButton";
 import {
   useUpdateProfileMutation,
   useVerifyTokenMutation,
-} from "../../features/api/auth/authAPI";
+} from "../../features/api/auth/authApi";
 import { userProfile } from "../../hooks/userProfile";
 import Availability from "../ProfileSetup/Availability";
 import EducationDetails from "../ProfileSetup/EducationDetails";

@@ -5,7 +5,7 @@ import { useState } from "react";
 import type { Admin } from "../../types/admin";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css"; // Make sure styles are imported
-import { useCreateAdminMutation } from "../../features/api/superAdmin/superAdmin";
+import { useCreateAdminMutation } from "../../features/api/superAdmin/superAdminApi";
 
 const AddAdmin = () => {
   const { Option } = Select;

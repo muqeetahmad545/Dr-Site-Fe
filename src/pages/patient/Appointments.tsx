@@ -15,7 +15,7 @@ import {
 import DrSmithImg from "../../assets/driamge.jpg";
 import "../../css/Appointments.css";
 import { PrimaryButton } from "../../components/PrimaryButton";
-import { useGetDoctorsQuery } from "../../features/api/admin/adminAPi";
+import { useGetDoctorsQuery } from "../../features/api/admin/adminApi";
 import type { Doctor } from "../../types/doctor";
 import LoadingSpinner from "../../components/LoadingSpinner";
 

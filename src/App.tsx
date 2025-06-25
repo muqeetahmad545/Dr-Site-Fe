@@ -4,7 +4,6 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import AdminSetting from "./pages/admin/Settings";
 
 import DoctorLayout from "./pages/doctor/DoctorLayout";
-import Patients from "./pages/doctor/Patients";
 import Schedule from "./pages/doctor/Schedule";
 
 import PatientLayout from "./pages/patient/PatientLayout";
@@ -35,6 +34,7 @@ import AddAdmin from "./pages/superAdmin/addAdmin";
 import SuperAdminDashboard from "./pages/superAdmin/SuperAdminDashboard";
 import { SuperAdminLayout } from "./pages/superAdmin/AdminLayout";
 import CallRoom from "./pages/doctor/CallRoom";
+import DrAppointments from "./pages/doctor/DrAppointments";
 function App() {
   const getUser = () => {
     const user = localStorage.getItem("user");
@@ -122,7 +122,7 @@ function App() {
         }
       >
         <Route path="dashboard" element={<DoctorDashboard />} />
-        <Route path="patient" element={<Patients />} />
+        <Route path="appointments" element={<DrAppointments />} />
         <Route path="schedule" element={<Schedule />} />
         <Route path="settings" element={<DoctorSetting />} />
       </Route>

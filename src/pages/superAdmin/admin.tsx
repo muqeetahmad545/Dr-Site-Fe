@@ -1,11 +1,16 @@
 import { Table, Card, Tag } from "antd";
 import { useNavigate } from "react-router-dom";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+// import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { PrimaryButton } from "../../components/PrimaryButton";
-import { useGetAdminsQuery } from "../../features/api/superAdmin/superAdmin";
+import { useGetAdminsQuery } from "../../features/api/superAdmin/superAdminApi";
+import { useEffect } from "react";
 
 const Admin = () => {
-  const { data: adminList, isLoading } = useGetAdminsQuery();
+  const { data: adminList, isLoading, refetch } = useGetAdminsQuery();
+
+  useEffect(() => {
+    refetch();
+  }, []);
   const navigate = useNavigate();
 
   const handelAddAdmin = () => {
@@ -35,21 +40,21 @@ const Admin = () => {
           <Tag color="red">Inactive</Tag>
         ),
     },
-    {
-      title: "Actions",
-      render: (_: any, _record: any) => (
-        <>
-          <EditOutlined
-            // onClick={() => handelEditAppointment(record.id)}
-            style={{ marginRight: 16, color: "#1890ff" }}
-          />
-          <DeleteOutlined
-            // onClick={() => handelDeleteAppointment(record.id)}
-            style={{ color: "#ff4d4f" }}
-          />
-        </>
-      ),
-    },
+    // {
+    //   title: "Actions",
+    //   render: (_: any, _record: any) => (
+    //     <>
+    //       <EditOutlined
+    //         // onClick={() => handelEditAppointment(record.id)}
+    //         style={{ marginRight: 16, color: "#1890ff" }}
+    //       />
+    //       <DeleteOutlined
+    //         // onClick={() => handelDeleteAppointment(record.id)}
+    //         style={{ color: "#ff4d4f" }}
+    //       />
+    //     </>
+    //   ),
+    // },
   ];
 
   return (

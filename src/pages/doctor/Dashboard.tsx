@@ -1,60 +1,112 @@
-import { Card, Col, Row, Statistic, List, Avatar, Typography } from 'antd';
+import { Card, Col, Row, Statistic, List, Avatar, Typography } from "antd";
 import {
   UserOutlined,
   CalendarOutlined,
   FileTextOutlined,
-} from '@ant-design/icons';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { BarChart, Bar, XAxis as BarXAxis, YAxis as BarYAxis, Tooltip as BarTooltip } from 'recharts';
+} from "@ant-design/icons";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis as BarXAxis,
+  YAxis as BarYAxis,
+  Tooltip as BarTooltip,
+} from "recharts";
+import { useGetAppointmentsDoctorQuery } from "../../features/api/doctor/doctorApi";
+import { format, subDays } from "date-fns";
 
 const { Text } = Typography;
 
 const DoctorDashboard = () => {
+  const { data: appointmentsData } = useGetAppointmentsDoctorQuery();
+
+  const appointments = appointmentsData?.data || [];
+  const totalAppointments = appointments.length;
+  const today = new Date().toISOString().split("T")[0];
+  const todaysAppointments = appointments.filter(
+    (appointment) => appointment.appointment_date === today
+  );
+
   const stats = {
-    patients: 124,
-    todayAppointments: 5,
+    patients: totalAppointments,
+    todayAppointments: todaysAppointments.length,
     pendingReports: 3,
   };
+  const upcomingAppointments = appointments
+    .filter((appointment) => appointment?.status === "assigned")
+    .map((item) => ({
+      name: item.patient?.user?.first_name,
+      time: item.appointment_time,
+      reason: item.symptoms || "General",
+      date: item.appointment_date || "",
+    }));
 
-  const upcomingAppointments = [
-    { name: 'John Doe', time: '10:00 AM', reason: 'Check-up' },
-    { name: 'Jane Smith', time: '11:30 AM', reason: 'Follow-up' },
-    { name: 'Alice Brown', time: '1:00 PM', reason: 'Consultation' },
-  ];
+  // Generate lineData from appointments
+  const getLineData = (appointments: any[]) => {
+    const today = new Date();
+    const data = [];
 
-  const lineData = [
-    { name: 'Mon', value: 20 },
-    { name: 'Tue', value: 35 },
-    { name: 'Wed', value: 40 },
-    { name: 'Thu', value: 50 },
-    { name: 'Fri', value: 70 },
-    { name: 'Sat', value: 60 },
-    { name: 'Sun', value: 90 },
-  ];
+    for (let i = 6; i >= 0; i--) {
+      const day = subDays(today, i);
+      const dayLabel = format(day, "EEE"); // e.g., "Mon", "Tue"
+      const dateString = format(day, "yyyy-MM-dd");
 
-  const barData = [
-    { day: 'Mon', appointments: 5 },
-    { day: 'Tue', appointments: 8 },
-    { day: 'Wed', appointments: 10 },
-    { day: 'Thu', appointments: 12 },
-    { day: 'Fri', appointments: 7 },
-  ];
+      const count = appointments.filter(
+        (a) => a.appointment_date === dateString
+      ).length;
 
-  // const pieData = [
-  //   { name: 'Check-up', value: 70 },
-  //   { name: 'Follow-up', value: 20 },
-  //   { name: 'Consultation', value: 10 },
-  // ];
+      data.push({ name: dayLabel, value: count });
+    }
+
+    return data;
+  };
+
+  const lineData = getLineData(appointments);
+
+  const getBarData = (appointments: any[]) => {
+    const barMap: Record<string, number> = {
+      Mon: 0,
+      Tue: 0,
+      Wed: 0,
+      Thu: 0,
+      Fri: 0,
+      Sat: 0,
+      Sun: 0,
+    };
+
+    appointments.forEach((a) => {
+      const day = format(new Date(a.appointment_date), "EEE");
+      if (barMap[day] !== undefined) {
+        barMap[day]++;
+      }
+    });
+
+    return Object.entries(barMap).map(([day, appointments]) => ({
+      day,
+      appointments,
+    }));
+  };
+
+  const barData = getBarData(appointments);
 
   return (
-    <div style={{backgroundColor: '#f0f2f5', minHeight: '100vh' }}>
+    <div style={{ backgroundColor: "#f0f2f5", minHeight: "100vh" }}>
       <Row gutter={[24, 24]}>
         <Col xs={24} md={8}>
           <Card>
             <Statistic
-              title="Total Patients"
+              title="Total Appointments"
               value={stats.patients}
-              prefix={<UserOutlined style={{ color: '#1890ff' }} />}
+              prefix={<UserOutlined style={{ color: "#1890ff" }} />}
             />
           </Card>
         </Col>
@@ -63,7 +115,7 @@ const DoctorDashboard = () => {
             <Statistic
               title="Today's Appointments"
               value={stats.todayAppointments}
-              prefix={<CalendarOutlined style={{ color: '#52c41a' }} />}
+              prefix={<CalendarOutlined style={{ color: "#52c41a" }} />}
             />
           </Card>
         </Col>
@@ -72,20 +124,35 @@ const DoctorDashboard = () => {
             <Statistic
               title="Pending Reports"
               value={stats.pendingReports}
-              prefix={<FileTextOutlined style={{ color: '#faad14' }} />}
+              prefix={<FileTextOutlined style={{ color: "#faad14" }} />}
             />
           </Card>
         </Col>
       </Row>
 
       {/* Bar Chart for Appointments per Day */}
-      <Card title="Appointments per Day" style={{ marginTop: '10px' }}>
+      <Card title="Appointments per Day" style={{ marginTop: "10px" }}>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={barData}>
             <defs>
-              <linearGradient id="gradientPrimary" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" style={{ stopColor: 'rgb(90, 172, 78)', stopOpacity: 1 }} />
-                <stop offset="100%" style={{ stopColor: 'rgba(74, 144, 226, 0.9)', stopOpacity: 1 }} />
+              <linearGradient
+                id="gradientPrimary"
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="0%"
+              >
+                <stop
+                  offset="0%"
+                  style={{ stopColor: "rgb(90, 172, 78)", stopOpacity: 1 }}
+                />
+                <stop
+                  offset="100%"
+                  style={{
+                    stopColor: "rgba(74, 144, 226, 0.9)",
+                    stopOpacity: 1,
+                  }}
+                />
               </linearGradient>
             </defs>
             <BarXAxis dataKey="day" />
@@ -96,20 +163,20 @@ const DoctorDashboard = () => {
         </ResponsiveContainer>
       </Card>
       {/* Row for Pending Report Distribution & Upcoming Appointments side by side */}
-      <Row gutter={[24, 24]} style={{ marginTop: '10px' }}>
+      <Row gutter={[24, 24]} style={{ marginTop: "10px" }}>
         <Col xs={24} md={12}>
-        <Card title="Appointment Trend (Last 7 Days)">
-        <ResponsiveContainer width="100%" height={285}>
-          <LineChart data={lineData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Line type="monotone" dataKey="value" stroke="#1890ff" />
-          </LineChart>
-        </ResponsiveContainer>
-      </Card>
+          <Card title="Appointment Trend (Last 7 Days)">
+            <ResponsiveContainer width="100%" height={285}>
+              <LineChart data={lineData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="value" stroke="#1890ff" />
+              </LineChart>
+            </ResponsiveContainer>
+          </Card>
           {/* <Card
             title="Pending Report Distribution"
             style={{
@@ -143,19 +210,23 @@ const DoctorDashboard = () => {
           <Card
             title="Upcoming Appointments"
             style={{
-              borderRadius: '8px',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+              borderRadius: "8px",
+              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+              minHeight: "390px",
             }}
           >
             <List
               itemLayout="horizontal"
-              dataSource={upcomingAppointments}
+              dataSource={upcomingAppointments.slice(0, 3)}
               renderItem={(item) => (
                 <List.Item>
                   <List.Item.Meta
                     avatar={
-                      <Avatar style={{ backgroundColor: '#87d068' }}>
-                        {item.name.split(' ').map((n) => n[0]).join('')}
+                      <Avatar style={{ backgroundColor: "#87d068" }}>
+                        {item.name
+                          ?.split(" ")
+                          .map((part: any) => part.charAt(0).toUpperCase())
+                          .join("") || "?"}
                       </Avatar>
                     }
                     title={<Text strong>{item.name}</Text>}
@@ -163,7 +234,9 @@ const DoctorDashboard = () => {
                       <>
                         <Text type="secondary">Time: {item.time}</Text>
                         <br />
-                        <Text>Reason: {item.reason}</Text>
+                        <Text type="secondary">Date: {item.date}</Text>
+                        <br />
+                        {/* <Text>Reason: {item.reason}</Text> */}
                       </>
                     }
                   />

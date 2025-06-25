@@ -3,20 +3,20 @@ import { Table, Tag, Card, message } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { PrimaryButton } from "../../components/PrimaryButton";
 import { useNavigate } from "react-router-dom";
-import { useGetPatientsQuery } from "../../features/api/admin/adminAPi";
+import { useGetPatientsQuery } from "../../features/api/admin/adminApi";
 import type { Patient } from "../../types/patient";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { userProfile } from "../../hooks/userProfile";
 
 const AllPatients: React.FC = () => {
-const { data: profile, isLoading, isError, refetch } = userProfile();
+  const { data: profile, isLoading, isError, refetch } = userProfile();
   const navigate = useNavigate();
-  const { data: patientData} = useGetPatientsQuery();
+  const { data: patientData } = useGetPatientsQuery();
   const [patientList, setPatientList] = useState<Patient[]>([]);
 
   useEffect(() => {
-  refetch(); 
-}, [refetch]);
+    refetch();
+  }, [refetch]);
 
   const isProfileComplete = (profile: any) => {
     return (

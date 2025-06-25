@@ -1,35 +1,51 @@
-import { Calendar, Badge, Card } from 'antd';
-const getListData = (value: any) => {
-  const date = value.date();
-  switch (date) {
-    case 10:
-      return [{ type: 'success', content: 'Patient: John Doe @ 10AM' }];
-    case 15:
-      return [{ type: 'warning', content: 'Surgery: Jane Smith @ 2PM' }];
-    case 25:
-      return [{ type: 'error', content: 'Consultation: Bob Lee @ 1PM' }];
-    default:
-      return [];
-  }
-};
-
-const dateCellRender = (value: any) => {
-  const listData = getListData(value);
-  return (
-    <ul className="events">
-      {listData.map((item, index) => (
-        <li key={index}>
-          <Badge status={item.type as any} text={item.content} />
-        </li>
-      ))}
-    </ul>
-  );
-};
+import { Calendar, Badge, Card, Spin } from "antd";
+import { useGetAppointmentsDoctorQuery } from "../../features/api/doctor/doctorApi";
 
 const Schedule = () => {
+  const { data: appointmentsData, isLoading } = useGetAppointmentsDoctorQuery();
+
+  // Step 1: Map appointments into date-keyed dictionary
+  const appointmentsByDate: Record<string, any[]> = {};
+
+  appointmentsData?.data?.forEach((a: any) => {
+    const dateKey = a.appointment_date; // Format: 'YYYY-MM-DD'
+    const patientName = `${a.patient.user.first_name} ${a.patient.user.last_name}`;
+    const time = a.appointment_time;
+    if (!appointmentsByDate[dateKey]) {
+      appointmentsByDate[dateKey] = [];
+    }
+
+    appointmentsByDate[dateKey].push({
+      type: "success",
+      content: `Patient: ${patientName} @ ${time}`,
+    });
+  });
+
+  // Step 2: Render appointments on each calendar date
+  const dateCellRender = (value: any) => {
+    const dateKey = value.format("YYYY-MM-DD");
+    const listData = appointmentsByDate[dateKey] || [];
+
+    return (
+      <div
+        className={
+          listData.length > 0 ? "bg-[#5aaa5e] rounded-md font-semibold p-1" : ""
+        }
+      >
+        <ul className="events">
+          {listData.map((item, index) => (
+            <li key={index}>
+              <Badge status={item.type} text={item.content} />
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
+
   return (
     <Card title="Schedule">
-<Calendar dateCellRender={dateCellRender} />
+      {isLoading ? <Spin /> : <Calendar dateCellRender={dateCellRender} />}
     </Card>
   );
 };

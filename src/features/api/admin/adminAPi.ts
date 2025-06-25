@@ -14,6 +14,7 @@ interface GetPatientsResponse {
 
 interface GetAppointmentsResponse {
   data: Appointment[];
+  message: String;
 }
 
 export const adminApi = createApi({
@@ -38,6 +39,24 @@ export const adminApi = createApi({
         method: "GET",
       }),
     }),
+    getAvailableDoctorsByTime: builder.mutation({
+      query: (body) => ({
+        url: "/admin/doctors",
+        method: "POST",
+        body,
+      }),
+    }),
+    assignMeetingLink: builder.mutation({
+      query: ({ appointmentId, linkExpiresAt, doctorId, meetingLink }) => ({
+        url: `/appointment/${appointmentId}`,
+        method: "PUT",
+        body: {
+          doctor_id: doctorId,
+          meeting_link: meetingLink,
+          linkExpiresAt: linkExpiresAt,
+        },
+      }),
+    }),
   }),
 });
 
@@ -45,4 +64,6 @@ export const {
   useGetDoctorsQuery,
   useGetPatientsQuery,
   useGetAppointmentsQuery,
+  useGetAvailableDoctorsByTimeMutation,
+  useAssignMeetingLinkMutation,
 } = adminApi;

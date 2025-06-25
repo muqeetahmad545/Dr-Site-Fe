@@ -15,7 +15,13 @@ import { UploadOutlined, UserOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { userProfile } from "../../hooks/userProfile";
-import { useUpdateProfileMutation } from "../../features/api/auth/authAPI";
+import { useUpdateProfileMutation } from "../../features/api/auth/authApi";
+import {
+  decryptBase64,
+  encryptBase64,
+  SECRET_KEY,
+  type EncryptedResult,
+} from "../../helper/Crypto";
 
 const AdminSetting: React.FC = () => {
   const { Option } = Select;
@@ -24,12 +30,25 @@ const AdminSetting: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const { data: profile, isLoading, isError, refetch } = userProfile();
   const [updateProfile] = useUpdateProfileMutation();
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-
+  const [profileImage, setProfileImage] = useState<EncryptedResult | null>(
+    null
+  );
   useEffect(() => {
     refetch();
   }, [refetch]);
 
+  const decryptedProfileImage = (() => {
+    const image = profileImage || profile?.data?.profile_image;
+    if (typeof image === "object" && image?.data && image?.iv) {
+      try {
+        return decryptBase64(image.data, image.iv, SECRET_KEY);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    return null;
+  })();
   useEffect(() => {
     if (profile) {
       form.setFieldsValue({
@@ -40,6 +59,7 @@ const AdminSetting: React.FC = () => {
         address: profile.data.address || "",
         status: profile.data.status || "",
         gender: profile.data.gender || "",
+        profileImage: profile.data.profile_image || "",
       });
     }
   }, [profile, form]);
@@ -47,6 +67,7 @@ const AdminSetting: React.FC = () => {
   const handleFinish = async (values: any) => {
     setLoading(true);
     try {
+      console.log("Submitted values:", values);
       await updateProfile(values).unwrap();
       message.success("Profile updated successfully!");
       refetch();
@@ -61,15 +82,32 @@ const AdminSetting: React.FC = () => {
       setLoading(false);
     }
   };
+  const readFileAsBase64 = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  const handleAvatarUpload = async ({ file, onSuccess }: any) => {
+    if (!file.type.startsWith("image/")) {
+      message.error("Only image files are allowed!");
+      return;
+    }
 
-  const handleAvatarUpload = ({ file, onSuccess }: any) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      setImageUrl(reader.result as string);
+    try {
+      const base64String = await readFileAsBase64(file);
+      const encrypted = encryptBase64(base64String, SECRET_KEY);
+
+      setProfileImage(encrypted);
+      form.setFieldsValue({ profile_image: encrypted }); // <- now it will be included
+
       onSuccess?.("ok");
-    };
-    reader.readAsDataURL(file);
+    } catch (error) {
+      message.error("Failed to read image file");
+    }
   };
+
   if (isLoading) {
     return <LoadingSpinner />;
   }
@@ -85,7 +123,11 @@ const AdminSetting: React.FC = () => {
       <div className="user-info">
         <Avatar
           size={100}
-          src={profile?.data.profile_image || imageUrl}
+          src={
+            decryptedProfileImage?.startsWith("data:image/")
+              ? decryptedProfileImage
+              : undefined
+          }
           icon={<UserOutlined />}
           style={{ marginBottom: 8 }}
         />
@@ -113,6 +155,10 @@ const AdminSetting: React.FC = () => {
       </div>
 
       <Form layout="vertical" onFinish={handleFinish} form={form}>
+        <Form.Item name="profile_image" hidden>
+          <Input />
+        </Form.Item>
+
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item

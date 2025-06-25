@@ -3,7 +3,7 @@ import { GoogleOutlined, FacebookFilled } from "@ant-design/icons";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthLayout } from "../components/AuthLayout";
 import { PrimaryButton } from "../components/PrimaryButton";
-import { useCreateAccountMutation } from "../features/api/auth/authAPI";
+import { useCreateAccountMutation } from "../features/api/auth/authApi";
 import type { APIError } from "../types/error";
 
 const { Title } = Typography;
