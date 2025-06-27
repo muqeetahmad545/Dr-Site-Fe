@@ -1,28 +1,28 @@
 import React, { useEffect, useState } from "react";
-import { Table, Tag, Card, message } from "antd";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { Table, Tag, Card } from "antd";
+// import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 // import { PrimaryButton } from "../../components/PrimaryButton";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { useGetDoctorsQuery } from "../../features/api/admin/adminApi";
 import type { Doctor } from "../../types/doctor";
 import LoadingSpinner from "../../components/LoadingSpinner";
-import { userProfile } from "../../hooks/userProfile";
+// import { userProfile } from "../../hooks/userProfile";
 
 const AllDoctors: React.FC = () => {
-  const navigate = useNavigate();
-  const { data: profile, refetch } = userProfile();
-  const { data: doctorsData, isLoading } = useGetDoctorsQuery();
+  // const navigate = useNavigate();
+  // const { data: profile, refetch } = userProfile();
+  const { data: doctorsData, refetch, isLoading } = useGetDoctorsQuery();
   const [doctorList, setDoctorList] = useState<Doctor[]>([]);
   useEffect(() => {
     refetch();
   }, [refetch]);
-  const isProfileComplete = (profile: any) => {
-    return (
-      profile?.data.first_name &&
-      profile?.data.email &&
-      profile?.data.status === "active"
-    );
-  };
+  // const isProfileComplete = (profile: any) => {
+  //   return (
+  //     profile?.data.first_name &&
+  //     profile?.data.email &&
+  //     profile?.data.status === "active"
+  //   );
+  // };
 
   useEffect(() => {
     if (doctorsData && doctorsData.data) {
@@ -30,18 +30,18 @@ const AllDoctors: React.FC = () => {
     }
   }, [doctorsData]);
 
-  const handleDelete = (id: any) => {
-    if (!isProfileComplete(profile)) {
-      message.warning(
-        "To proceed, please complete your profile information in settings."
-      );
-      navigate("/admin/settings");
-      return;
-    }
-    const updatedList = doctorList.filter((doc) => doc.id !== id);
-    setDoctorList(updatedList);
-    message.success("Doctor deleted successfully!");
-  };
+  // const handleDelete = (id: any) => {
+  //   if (!isProfileComplete(profile)) {
+  //     message.warning(
+  //       "To proceed, please complete your profile information in settings."
+  //     );
+  //     navigate("/admin/settings");
+  //     return;
+  //   }
+  //   const updatedList = doctorList.filter((doc) => doc.id !== id);
+  //   setDoctorList(updatedList);
+  //   message.success("Doctor deleted successfully!");
+  // };
 
   // const handleAddDoctor = () => {
   //   if (!isProfileComplete(profile)) {
@@ -54,16 +54,16 @@ const AllDoctors: React.FC = () => {
   //   navigate("/admin/add-doctor");
   // };
 
-  const handelEditPatient = (id: any) => {
-    if (!isProfileComplete(profile)) {
-      message.warning(
-        "To proceed, please complete your profile information in settings."
-      );
-      navigate("/admin/settings");
-      return;
-    }
-    navigate(`/admin/edit-doctor/${id}`);
-  };
+  // const handelEditPatient = (id: any) => {
+  //   if (!isProfileComplete(profile)) {
+  //     message.warning(
+  //       "To proceed, please complete your profile information in settings."
+  //     );
+  //     navigate("/admin/settings");
+  //     return;
+  //   }
+  //   navigate(`/admin/edit-doctor/${id}`);
+  // };
 
   const columns = [
     {
@@ -94,21 +94,21 @@ const AllDoctors: React.FC = () => {
           <Tag color="red">Inactive</Tag>
         ),
     },
-    {
-      title: "Actions",
-      render: (_: any, record: any) => (
-        <>
-          <EditOutlined
-            onClick={() => handelEditPatient(record.id)}
-            style={{ marginRight: 16, color: "#1890ff", cursor: "pointer" }}
-          />
-          <DeleteOutlined
-            onClick={() => handleDelete(record.id)}
-            style={{ color: "#ff4d4f", cursor: "pointer" }}
-          />
-        </>
-      ),
-    },
+    // {
+    //   title: "Actions",
+    //   render: (_: any, record: any) => (
+    //     <>
+    //       <EditOutlined
+    //         onClick={() => handelEditPatient(record.id)}
+    //         style={{ marginRight: 16, color: "#1890ff", cursor: "pointer" }}
+    //       />
+    //       <DeleteOutlined
+    //         onClick={() => handleDelete(record.id)}
+    //         style={{ color: "#ff4d4f", cursor: "pointer" }}
+    //       />
+    //     </>
+    //   ),
+    // },
   ];
   if (isLoading) {
     return <LoadingSpinner />;

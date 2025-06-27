@@ -25,48 +25,48 @@ const SuperAdminDashboard = () => {
   const COLORS = ["#1890ff", "#13c2c2", "#52c41a", "#fa8c16"];
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-3xl font-bold text-gray-800">SuperAdmin Dashboard</h1>
+    <div className="">
+      <Card title="Super Admin Dashboard">
+        <Row gutter={[24, 24]}>
+          <Col xs={24} md={12}>
+            <Card title="Doctors & Patients Overview">
+              <Column
+                data={doctorPatientStats}
+                xField="type"
+                yField="value"
+                label={{ position: "middle" }}
+                height={300}
+                color={["#1890ff", "#fa541c"]}
+              />
+            </Card>
+          </Col>
 
-      <Row gutter={[24, 24]}>
-        <Col xs={24} md={12}>
-          <Card title="Doctors & Patients Overview">
-            <Column
-              data={doctorPatientStats}
-              xField="type"
-              yField="value"
-              label={{ position: "middle" }}
-              height={300}
-              color={["#1890ff", "#fa541c"]}
-            />
-          </Card>
-        </Col>
-
-        <Col xs={24} md={12}>
-          <Card title="Doctor Specialties">
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={pieData}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={100}
-                  fill="#8884d8"
-                  label
-                >
-                  {pieData.map((_, index) => (
-                    <Cell key={index} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <ReTooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </Card>
-        </Col>
-      </Row>
+          <Col xs={24} md={12}>
+            <Card title="Doctor Specialties">
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={pieData}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={100}
+                    fill="#8884d8"
+                    label
+                  >
+                    {pieData.map((_, index) => (
+                      <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <ReTooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </Card>
+          </Col>
+        </Row>
+      </Card>
     </div>
   );
 };

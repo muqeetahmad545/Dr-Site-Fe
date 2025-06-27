@@ -3,10 +3,10 @@ export interface Profile {
   role?: string;
   profile_image?: string;
   verifiedToken?: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone: string;
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  phone?: string;
   password?: string;
   address?: string;
   gender?: string;

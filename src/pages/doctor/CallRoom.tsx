@@ -20,7 +20,7 @@ export function getUrlParams(url = window.location.href) {
 export default function CallRoom() {
   const roomID = getUrlParams().get("roomID") || randomID(5);
   const userID = "patient_" + randomID(5);
-  const userName = "Patient";
+  const userName = getUrlParams().get("userName") || "Anonymous";
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

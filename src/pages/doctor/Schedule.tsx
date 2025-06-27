@@ -1,5 +1,6 @@
-import { Calendar, Badge, Card, Spin } from "antd";
+import { Calendar, Badge, Card } from "antd";
 import { useGetAppointmentsDoctorQuery } from "../../features/api/doctor/doctorApi";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 const Schedule = () => {
   const { data: appointmentsData, isLoading } = useGetAppointmentsDoctorQuery();
@@ -45,7 +46,11 @@ const Schedule = () => {
 
   return (
     <Card title="Schedule">
-      {isLoading ? <Spin /> : <Calendar dateCellRender={dateCellRender} />}
+      {isLoading ? (
+        <LoadingSpinner />
+      ) : (
+        <Calendar dateCellRender={dateCellRender} />
+      )}
     </Card>
   );
 };

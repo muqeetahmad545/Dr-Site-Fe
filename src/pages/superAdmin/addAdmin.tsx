@@ -22,7 +22,7 @@ const AddAdmin = () => {
       const response = await addAdmin(values).unwrap();
       if (response.status === "success") {
         message.success(response.message || "Admin created successfully");
-        navigate("/SuperAdmin/admin");
+        navigate("/SuperAdmin/admins");
       } else {
         message.error(response.message || "Something went wrong");
       }
@@ -111,7 +111,7 @@ const AddAdmin = () => {
 
         <Form.Item style={{ textAlign: "right" }}>
           <PrimaryButton
-            onClick={() => navigate("/SuperAdmin/admin")}
+            onClick={() => navigate("/SuperAdmin/admins")}
             style={{ marginRight: 8 }}
           >
             Cancel

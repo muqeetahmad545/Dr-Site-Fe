@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { Table, Card, Modal, Descriptions } from "antd";
 import { useGetAppointmentsDoctorQuery } from "../../features/api/doctor/doctorApi";
 import { PrimaryButton } from "../../components/PrimaryButton";
+import { useNavigate } from "react-router-dom";
 
 const DrAppointments = () => {
+  const navigate = useNavigate();
   const {
     data: appointmentsData,
     isLoading,
@@ -40,6 +42,7 @@ const DrAppointments = () => {
       id: a.id,
       name: `${a.patient.user.first_name} ${a.patient.user.last_name}`,
       age,
+      email: a.patient.user.email,
       symptoms: a.symptoms,
       phone: a.patient.user.phone,
       appointment_date: a.appointment_date,
@@ -48,14 +51,19 @@ const DrAppointments = () => {
     };
   });
 
-  const handleModalOpen = (patient: any) => {
-    setSelectedPatient(patient);
-    setOpenModal(true);
-  };
+  // const handleModalOpen = (patient: any) => {
+  //   setSelectedPatient(patient);
+  //   setOpenModal(true);
+  // };
 
   const handleModalClose = () => {
     setOpenModal(false);
     setSelectedPatient(null);
+  };
+  const handleViewDetails = (patient: any) => {
+    navigate(`/doctor/appointments/${patient.id}`, {
+      state: { patient },
+    });
   };
 
   const columns = [
@@ -67,11 +75,9 @@ const DrAppointments = () => {
       title: "Actions",
       key: "actions",
       render: (_: any, record: any) => (
-        <>
-          <PrimaryButton onClick={() => handleModalOpen(record)}>
-            View Details
-          </PrimaryButton>
-        </>
+        <PrimaryButton onClick={() => handleViewDetails(record)}>
+          View Details
+        </PrimaryButton>
       ),
     },
   ];

@@ -1,25 +1,19 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQuery } from "../../../util/baseApi";
-import type { Admin } from "../../../types/admin";
-
-interface GetAdminResponse {
-  data: Admin[];
-  message: string;
-  status: string;
-}
+import type { Response, Admin } from "../../../types";
 
 export const superAdminApi = createApi({
   reducerPath: "superAdminApi",
   baseQuery,
   endpoints: (builder) => ({
-    createAdmin: builder.mutation<GetAdminResponse, Admin>({
+    createAdmin: builder.mutation<Response, Admin>({
       query: (userData) => ({
         url: "/auth/register-admin",
         method: "POST",
         body: userData,
       }),
     }),
-    getAdmins: builder.query<GetAdminResponse, void>({
+    getAdmins: builder.query<Response, void>({
       query: () => ({
         url: "/admin/admins",
         method: "GET",

@@ -1,11 +1,11 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import type { Appointment } from "../../../types/appointment";
 import { baseQuery } from "../../../util/baseApi";
-
-interface GetAppointmentsResponse {
-  data: Appointment[];
-  message: String;
-}
+import type {
+  GetAppointmentsResponse,
+  Prescription,
+  Response,
+  SickLeaveRequest,
+} from "../../../types";
 
 export const doctorApi = createApi({
   reducerPath: "doctorApi",
@@ -17,7 +17,25 @@ export const doctorApi = createApi({
         method: "GET",
       }),
     }),
+    generateSickLeave: builder.mutation<Response, SickLeaveRequest>({
+      query: (body) => ({
+        url: "/doctor/generate-sick-leave",
+        method: "POST",
+        body,
+      }),
+    }),
+    generatePrescription: builder.mutation<Response, Prescription>({
+      query: (body) => ({
+        url: "/doctor/prescription",
+        method: "POST",
+        body,
+      }),
+    }),
   }),
 });
 
-export const { useGetAppointmentsDoctorQuery } = doctorApi;
+export const {
+  useGetAppointmentsDoctorQuery,
+  useGenerateSickLeaveMutation,
+  useGeneratePrescriptionMutation,
+} = doctorApi;

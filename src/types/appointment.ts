@@ -10,7 +10,7 @@ export interface Appointment {
   address?: string;
   gender?: string;
   age?: number;
-  appointment_date?: string;
+  appointment_date?: string | any;
   appointment_time?: string;
   note?: string;
   symptoms?: string;

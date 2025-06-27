@@ -1,21 +1,11 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import type { Appointment } from "../../../types/appointment";
-import type { Doctor } from "../../../types/doctor";
-import type { Patient } from "../../../types/patient";
+
 import { baseQuery } from "../../../util/baseApi";
-
-interface GetDoctorsResponse {
-  data: Doctor[];
-}
-
-interface GetPatientsResponse {
-  data: Patient[];
-}
-
-interface GetAppointmentsResponse {
-  data: Appointment[];
-  message: String;
-}
+import type {
+  GetAppointmentsResponse,
+  GetDoctorsResponse,
+  GetPatientsResponse,
+} from "../../../types";
 
 export const adminApi = createApi({
   reducerPath: "adminApi",
@@ -33,9 +23,9 @@ export const adminApi = createApi({
         method: "GET",
       }),
     }),
-    getAppointments: builder.query<GetAppointmentsResponse, void>({
+    getAdminAppointments: builder.query<GetAppointmentsResponse, void>({
       query: () => ({
-        url: "/appointment/appointments",
+        url: "/admin/appointments",
         method: "GET",
       }),
     }),
@@ -63,7 +53,7 @@ export const adminApi = createApi({
 export const {
   useGetDoctorsQuery,
   useGetPatientsQuery,
-  useGetAppointmentsQuery,
+  useGetAdminAppointmentsQuery,
   useGetAvailableDoctorsByTimeMutation,
   useAssignMeetingLinkMutation,
 } = adminApi;

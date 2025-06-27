@@ -5,7 +5,7 @@ import { CheckCircleOutlined } from "@ant-design/icons";
 // import { useNavigate } from "react-router-dom";
 import {
   useAssignMeetingLinkMutation,
-  useGetAppointmentsQuery,
+  useGetAdminAppointmentsQuery,
   useGetAvailableDoctorsByTimeMutation,
 } from "../../features/api/admin/adminApi";
 import type { Appointment } from "../../types/appointment";
@@ -19,7 +19,7 @@ const AllAppointments: React.FC = () => {
     data: appointmentsData,
     isLoading,
     refetch: refetchAppointments,
-  } = useGetAppointmentsQuery();
+  } = useGetAdminAppointmentsQuery();
   const [appointmentsList, setAppointmentList] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(false);
   const [assignMeetingLink] = useAssignMeetingLinkMutation();
@@ -97,10 +97,10 @@ const AllAppointments: React.FC = () => {
         day,
         time: record.appointment_time,
       }).unwrap();
-
-      if (response?.message) {
-        message.success(response.message);
-      }
+      console.log("response", response);
+      // if (response?.message) {
+      //   message.success(response.message);
+      // }
     } catch (err: any) {
       message.error(err.data.message);
     }
@@ -134,7 +134,9 @@ const AllAppointments: React.FC = () => {
       setLoading(false);
     }
   };
-
+  useEffect(() => {
+    refetchAppointments();
+  }, []);
   const columns = [
     { title: "Patient Name", dataIndex: "patientName" },
     { title: "Age", dataIndex: "age" },

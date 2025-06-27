@@ -36,7 +36,16 @@ export const SideBarLayout: React.FC<Props> = ({ role }) => {
 
   const route = location.pathname.split("/").pop();
   const titles: { [key: string]: string } = {
-    dashboard: "Dashboard",
+    dashboard:
+      role === "SuperAdmin"
+        ? "Super Admin Dashboard"
+        : role === "admin"
+        ? "Admin Dashboard"
+        : role === "doctor"
+        ? "Doctor Dashboard"
+        : role === "patient"
+        ? "Patient Dashboard"
+        : "Dashboard",
     settings: "Settings",
     patient: "Patients",
     schedule: "Schedule",
@@ -47,9 +56,8 @@ export const SideBarLayout: React.FC<Props> = ({ role }) => {
     addPatient: "Add Patient",
     "health-overview": "Health Overview",
     "all-appointments": "Appointments",
-    admin: "Admin",
+    admins: "Admins",
     "add-admin": "Add Admin",
-    "edit-admin": "Edit Admin",
   };
 
   const title = titles[route || "dashboard"];
@@ -59,13 +67,12 @@ export const SideBarLayout: React.FC<Props> = ({ role }) => {
     NavLinkItem[]
   > = {
     SuperAdmin: [
-      // { to: "add-admin", label: "Dashboard", icon: <DashboardOutlined /> },
       {
         to: "dashboard",
         label: "Dashboard",
-        icon: <TeamOutlined />,
+        icon: <DashboardOutlined />,
       },
-      { to: "admin", label: "Admin", icon: <TeamOutlined /> },
+      { to: "admins", label: "Admins", icon: <TeamOutlined /> },
     ],
     admin: [
       { to: "dashboard", label: "Dashboard", icon: <DashboardOutlined /> },

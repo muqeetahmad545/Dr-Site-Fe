@@ -1,50 +1,16 @@
 import { apiSlice } from "../../../store/apiSlice";
-import type { Profile } from "../../../types/profile";
 
-// ---------- Request Interfaces ----------
-interface SignUpData {
-  email: string;
-  password: string;
-  role: string;
-}
+import type {
+  LoginData,
+  LoginResponse,
+  SignUpData,
+  SignUpResponse,
+  GetProfileResponse,
+  ForgotData,
+  ResetData,
+  Profile,
+} from "../../../types";
 
-interface LoginData {
-  email: string;
-  password: string;
-}
-
-interface ForgotData {
-  email: string;
-  message?: string;
-}
-
-interface ResetData {
-  email: string;
-  password: string;
-  otp: string;
-  message?: string;
-}
-
-// ---------- Response Interfaces ----------
-interface SignUpResponse {
-  message?: string;
-  access_token: string;
-  data: Profile;
-  token: string;
-}
-
-interface LoginResponse {
-  status: string;
-  message?: string;
-  data: string;
-}
-
-interface GetProfileResponse {
-  data: Profile;
-  message?: string;
-}
-
-// ---------- Auth API ----------
 export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     createAccount: builder.mutation<SignUpResponse, SignUpData>({

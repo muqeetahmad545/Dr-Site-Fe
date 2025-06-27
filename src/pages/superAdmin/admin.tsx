@@ -62,7 +62,7 @@ const Admin = () => {
       className="Admin"
       title={
         <div className="flex items-center justify-between w-full">
-          <span className="text-lg font-semibold">Admin</span>
+          <span className="text-lg font-semibold">Admins</span>
           <div>
             <PrimaryButton onClick={handelAddAdmin}>Add Admin</PrimaryButton>
           </div>

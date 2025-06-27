@@ -1,3 +1,5 @@
+import type { Appointment } from "./appointment";
+
 export interface Doctor {
   id: string;
   first_name?: string;
@@ -20,4 +22,30 @@ export interface Doctor {
     doctor_availabilities: string | null;
     available_times: string | null;
   };
+}
+
+export interface GetAppointmentsResponse {
+  data: Appointment[];
+  message: String;
+}
+export interface SickLeaveRequest {
+  appointmentId: string;
+  startDate: string;
+  endDate: string;
+  reason: string;
+}
+export interface Medication {
+  name?: string;
+  dosage?: string;
+  frequency?: string;
+  duration?: string;
+  instructions?: string;
+}
+
+export interface Prescription {
+  appointmentId?: number;
+  notes?: string;
+  pharmacy?: string;
+  testsRecommended?: string[];
+  medications?: Medication[];
 }

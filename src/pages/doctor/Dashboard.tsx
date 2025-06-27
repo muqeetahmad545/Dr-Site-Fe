@@ -23,6 +23,7 @@ import {
 } from "recharts";
 import { useGetAppointmentsDoctorQuery } from "../../features/api/doctor/doctorApi";
 import { format, subDays } from "date-fns";
+import dayjs from "dayjs";
 
 const { Text } = Typography;
 
@@ -35,20 +36,28 @@ const DoctorDashboard = () => {
   const todaysAppointments = appointments.filter(
     (appointment) => appointment.appointment_date === today
   );
-
-  const stats = {
-    patients: totalAppointments,
-    todayAppointments: todaysAppointments.length,
-    pendingReports: 3,
-  };
   const upcomingAppointments = appointments
-    .filter((appointment) => appointment?.status === "assigned")
+    .filter((appointment) => {
+      if (appointment?.status !== "assigned") return false;
+
+      const dateStr = appointment.appointment_date;
+      const timeStr = appointment.appointment_time;
+      const appointmentDateTime = new Date(`${dateStr} ${timeStr}`);
+
+      return appointmentDateTime >= new Date();
+    })
     .map((item) => ({
       name: item.patient?.user?.first_name,
       time: item.appointment_time,
       reason: item.symptoms || "General",
       date: item.appointment_date || "",
     }));
+
+  const stats = {
+    patients: totalAppointments,
+    todayAppointments: todaysAppointments.length,
+    upcomingAppointments: upcomingAppointments.length,
+  };
 
   // Generate lineData from appointments
   const getLineData = (appointments: any[]) => {
@@ -116,14 +125,19 @@ const DoctorDashboard = () => {
               title="Today's Appointments"
               value={stats.todayAppointments}
               prefix={<CalendarOutlined style={{ color: "#52c41a" }} />}
+              suffix={
+                <Typography.Text type="secondary" style={{ marginLeft: 8 }}>
+                  {dayjs().format("MMMM D, YYYY")}
+                </Typography.Text>
+              }
             />
           </Card>
         </Col>
         <Col xs={24} md={8}>
           <Card>
             <Statistic
-              title="Pending Reports"
-              value={stats.pendingReports}
+              title="Upcoming Appointments"
+              value={stats.upcomingAppointments}
               prefix={<FileTextOutlined style={{ color: "#faad14" }} />}
             />
           </Card>
