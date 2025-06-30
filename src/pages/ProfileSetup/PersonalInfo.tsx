@@ -120,13 +120,25 @@ const PersonalInfo: React.FC<ProfileSetupProps> = ({
           icon={<UserOutlined />}
           style={{ marginBottom: 8 }}
         />
-
+        {/* <Form.Item
+          name="profileImage"
+          rules={[{ required: true, message: "Please upload a profile image" }]}
+          style={{ marginBottom: 0 }}
+        >
+          <input type="hidden" />
+        </Form.Item> */}
         <Upload
+          accept=".jpg,.jpeg,.png"
           showUploadList={false}
           beforeUpload={(file) => {
-            const isImage = file.type.startsWith("image/");
-            if (!isImage) message.error("Only image files are allowed!");
-            return isImage;
+            const isJpgOrPng =
+              file.type === "image/jpeg" || file.type === "image/png";
+
+            if (!isJpgOrPng) {
+              message.error("Only JPG or PNG files are allowed!");
+            }
+
+            return isJpgOrPng;
           }}
           customRequest={handleAvatarUpload}
         >
@@ -173,7 +185,7 @@ const PersonalInfo: React.FC<ProfileSetupProps> = ({
             rules={[{ required: true }]}
           >
             <PhoneInput
-              country="pk"
+              country="ie"
               // Use form.getFieldValue to set value to keep in sync
               value={form.getFieldValue("phone")}
               onChange={(phone) => {
@@ -207,15 +219,18 @@ const PersonalInfo: React.FC<ProfileSetupProps> = ({
       </Row>
       <Row gutter={16}>
         <Col span={12}>
-          <Form.Item label="Status" name="status" rules={[{ required: true }]}>
+          {/* <Form.Item label="Status" name="status" rules={[{ required: true }]}>
             <Select placeholder="Select status">
               <Option value="active">Active</Option>
               <Option value="inActive">InActive</Option>
             </Select>
+          </Form.Item> */}
+          <Form.Item label="Status" name="status" initialValue="status">
+            <Input disabled />
           </Form.Item>
         </Col>
         <Col span={12}>
-          <Form.Item label="Passport Number" name="passport_number">
+          <Form.Item label="Passport Number / ID" name="passport_number">
             <Input />
           </Form.Item>
         </Col>
@@ -225,8 +240,9 @@ const PersonalInfo: React.FC<ProfileSetupProps> = ({
           <Form.Item label="Address Document">
             {addressDocument ? (
               (() => {
-                const decryptedData = decryptDocument(addressDocument);
-                if (!decryptedData) return <p>Failed to decrypt document</p>;
+                const decryptedData =
+                  addressDocument && decryptDocument(addressDocument);
+                if (!decryptedData) return <p>No document uploaded</p>;
 
                 if (decryptedData.startsWith("data:application/pdf")) {
                   return (

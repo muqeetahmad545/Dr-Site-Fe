@@ -59,7 +59,7 @@ const AdminSetting: React.FC = () => {
         address: profile.data.address || "",
         status: profile.data.status || "",
         gender: profile.data.gender || "",
-        profileImage: profile.data.profile_image || "",
+        profile_image: profile.data.profile_image || "",
       });
     }
   }, [profile, form]);
@@ -132,13 +132,17 @@ const AdminSetting: React.FC = () => {
           style={{ marginBottom: 8 }}
         />
         <Upload
+          accept=".jpg,.jpeg,.png"
           showUploadList={false}
           beforeUpload={(file) => {
-            const isImage = file.type.startsWith("image/");
-            if (!isImage) {
-              message.error("Only image files are allowed!");
+            const isJpgOrPng =
+              file.type === "image/jpeg" || file.type === "image/png";
+
+            if (!isJpgOrPng) {
+              message.error("You can only upload JPG or PNG files!");
             }
-            return isImage;
+
+            return isJpgOrPng;
           }}
           customRequest={handleAvatarUpload}
         >

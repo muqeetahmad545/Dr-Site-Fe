@@ -2,14 +2,14 @@ import React, { useEffect, useState } from "react";
 import { Table, Tag, Card } from "antd";
 // import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 // import { PrimaryButton } from "../../components/PrimaryButton";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useGetDoctorsQuery } from "../../features/api/admin/adminApi";
 import type { Doctor } from "../../types/doctor";
 import LoadingSpinner from "../../components/LoadingSpinner";
 // import { userProfile } from "../../hooks/userProfile";
 
 const AllDoctors: React.FC = () => {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   // const { data: profile, refetch } = userProfile();
   const { data: doctorsData, refetch, isLoading } = useGetDoctorsQuery();
   const [doctorList, setDoctorList] = useState<Doctor[]>([]);
@@ -128,6 +128,9 @@ const AllDoctors: React.FC = () => {
         columns={columns}
         rowKey="id"
         loading={isLoading}
+        onRow={(record) => ({
+          onClick: () => navigate(`/admin/doctor/${record.id}`),
+        })}
       />
     </Card>
   );

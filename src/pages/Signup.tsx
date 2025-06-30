@@ -1,5 +1,5 @@
-import { Input, Form, Typography, Card, Select, Button, message } from "antd";
-import { GoogleOutlined, FacebookFilled } from "@ant-design/icons";
+import { Input, Form, Typography, Card, Select, message } from "antd";
+// import { GoogleOutlined, FacebookFilled } from "@ant-design/icons";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthLayout } from "../components/AuthLayout";
 import { PrimaryButton } from "../components/PrimaryButton";
@@ -32,13 +32,13 @@ export const SignupPage = () => {
     }
   };
 
-  const loginWithGoogle = () => {
-    alert("Google login not implemented.");
-  };
+  // const loginWithGoogle = () => {
+  //   alert("Google login not implemented.");
+  // };
 
-  const loginWithFacebook = () => {
-    alert("Facebook login not implemented.");
-  };
+  // const loginWithFacebook = () => {
+  //   alert("Facebook login not implemented.");
+  // };
 
   return (
     <AuthLayout>
@@ -126,10 +126,10 @@ export const SignupPage = () => {
               Sign Up
             </PrimaryButton>
           </Form.Item>
-          <div style={{ marginBottom: "10px", textAlign: "center" }}>
+          {/* <div style={{ marginBottom: "10px", textAlign: "center" }}>
             Or continue with
-          </div>{" "}
-          <div style={{ display: "flex", gap: 10 }}>
+          </div>{" "} */}
+          {/* <div style={{ display: "flex", gap: 10 }}>
             <Button icon={<GoogleOutlined />} block onClick={loginWithGoogle}>
               Google
             </Button>
@@ -141,7 +141,7 @@ export const SignupPage = () => {
             >
               Facebook
             </Button>
-          </div>
+          </div> */}
         </Form>
       </Card>
     </AuthLayout>

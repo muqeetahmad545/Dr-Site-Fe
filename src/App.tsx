@@ -36,6 +36,7 @@ import { SuperAdminLayout } from "./pages/superAdmin/AdminLayout";
 import CallRoom from "./pages/doctor/CallRoom";
 import DrAppointments from "./pages/doctor/DrAppointments";
 import AppointmentDetails from "./pages/doctor/AppointmentDetails";
+// import DoctorDetails from "./pages/admin/DoctorDetails";
 function App() {
   const getUser = () => {
     const user = localStorage.getItem("user");
@@ -112,6 +113,7 @@ function App() {
         <Route path="add-appointment" element={<AddAppointment />} />
         <Route path="edit-appointment/:id" element={<AddAppointment />} />
         <Route path="settings" element={<AdminSetting />} />
+        {/* <Route path="/admin/doctor/:id" element={<DoctorDetails />} /> */}
       </Route>
 
       <Route

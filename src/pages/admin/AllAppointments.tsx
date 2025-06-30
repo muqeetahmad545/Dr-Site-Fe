@@ -12,6 +12,7 @@ import type { Appointment } from "../../types/appointment";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { message } from "antd";
 import { MdPersonAdd } from "react-icons/md";
+import Swal from "sweetalert2";
 
 const AllAppointments: React.FC = () => {
   // const navigate = useNavigate();
@@ -85,7 +86,7 @@ const AllAppointments: React.FC = () => {
   // };
 
   const openAssignModal = async (record: any) => {
-    setAssigningAppointment(record);
+    setAssigningAppointment(null); // reset modal state first
 
     const date = new Date(record.appointment_date);
     const day = date
@@ -97,14 +98,28 @@ const AllAppointments: React.FC = () => {
         day,
         time: record.appointment_time,
       }).unwrap();
-      console.log("response", response);
-      // if (response?.message) {
-      //   message.success(response.message);
-      // }
+
+      if (!response?.data || response.data.length === 0) {
+        Swal.fire({
+          icon: "error",
+          title: "No Doctors Available",
+          text: "There are no doctors available at the selected time.",
+          confirmButtonColor: "#3085d6",
+        });
+        return;
+      }
+
+      setAssigningAppointment(record);
     } catch (err: any) {
-      message.error(err.data.message);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: err?.data?.message || "Failed to fetch doctors.",
+        confirmButtonColor: "#3085d6",
+      });
     }
   };
+
   const generateRoomID = (patientName: string) => {
     const randomStr = Math.random().toString(36).substring(2, 7);
     return `${patientName.replace(/\s+/g, "_")}_${randomStr}`;
@@ -209,45 +224,89 @@ const AllAppointments: React.FC = () => {
           <Table dataSource={appointmentsList} columns={columns} rowKey="id" />
         </Card>
       )}
-
       {/* ✅ Modal to assign doctor */}
-      <Modal
-        open={!!assigningAppointment}
-        onCancel={() => setAssigningAppointment(null)}
-        onOk={async () => {
-          if (assigningAppointment && selectedDoctorId) {
-            setLoading(true);
-            try {
-              await handleCreateMeeting(assigningAppointment, selectedDoctorId);
-              setAssigningAppointment(null);
-              await refetchAppointments();
-            } finally {
-              setLoading(false);
+      <div className="swal2-popup swal2-modal swal2-icon-error swal2-show">
+        <Modal
+          open={!!assigningAppointment}
+          onCancel={() => setAssigningAppointment(null)}
+          onOk={async () => {
+            if (assigningAppointment && selectedDoctorId) {
+              setLoading(true);
+              try {
+                await handleCreateMeeting(
+                  assigningAppointment,
+                  selectedDoctorId
+                );
+                setAssigningAppointment(null);
+                await refetchAppointments();
+              } finally {
+                setLoading(false);
+              }
             }
-          }
-        }}
-        okButtonProps={{ disabled: !selectedDoctorId || loading, loading }}
-        okText="Assign"
-        title="Assign Doctor"
-      >
-        {loadingDoctors ? (
-          <Spin />
-        ) : (
-          <Select
-            style={{ width: "100%" }}
-            placeholder="Select a doctor"
-            onChange={(value) => setSelectedDoctorId(value)}
-            value={selectedDoctorId}
-          >
-            {doctorData?.data?.map((doc: any) => (
-              <Select.Option key={doc.doctor.id} value={doc.doctor.id}>
-                {doc.doctor.user.first_name} {doc.doctor.user.last_name} — (
-                {doc.doctor.specialization})
-              </Select.Option>
-            ))}
-          </Select>
-        )}
-      </Modal>
+          }}
+          okButtonProps={{ disabled: !selectedDoctorId || loading, loading }}
+          okText="Assign"
+          title="Assign Doctor"
+        >
+          {loadingDoctors ? (
+            <Spin />
+          ) : (
+            <Select
+              style={{ width: "100%" }}
+              placeholder="Select a doctor"
+              onChange={(value) => setSelectedDoctorId(value)}
+              value={selectedDoctorId}
+            >
+              {doctorData?.data?.map((doc: any) => (
+                <Select.Option key={doc.doctor.id} value={doc.doctor.id}>
+                  {doc.doctor.user.first_name} {doc.doctor.user.last_name} — (
+                  {doc.doctor.specialization})
+                </Select.Option>
+              ))}
+            </Select>
+          )}
+        </Modal>{" "}
+        <Modal
+          open={!!assigningAppointment}
+          onCancel={() => setAssigningAppointment(null)}
+          onOk={async () => {
+            if (assigningAppointment && selectedDoctorId) {
+              setLoading(true);
+              try {
+                await handleCreateMeeting(
+                  assigningAppointment,
+                  selectedDoctorId
+                );
+                setAssigningAppointment(null);
+                await refetchAppointments();
+              } finally {
+                setLoading(false);
+              }
+            }
+          }}
+          okButtonProps={{ disabled: !selectedDoctorId || loading, loading }}
+          okText="Assign"
+          title="Assign Doctor"
+        >
+          {loadingDoctors ? (
+            <Spin />
+          ) : (
+            <Select
+              style={{ width: "100%" }}
+              placeholder="Select a doctor"
+              onChange={(value) => setSelectedDoctorId(value)}
+              value={selectedDoctorId}
+            >
+              {doctorData?.data?.map((doc: any) => (
+                <Select.Option key={doc.doctor.id} value={doc.doctor.id}>
+                  {doc.doctor.user.first_name} {doc.doctor.user.last_name} — (
+                  {doc.doctor.specialization})
+                </Select.Option>
+              ))}
+            </Select>
+          )}
+        </Modal>
+      </div>
     </>
   );
 };
