@@ -2,6 +2,8 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 
 import { baseQuery } from "../../../util/baseApi";
 import type {
+  Doctor,
+  DoctorApiResponse,
   GetAppointmentsResponse,
   GetDoctorsResponse,
   GetPatientsResponse,
@@ -29,6 +31,20 @@ export const adminApi = createApi({
         method: "GET",
       }),
     }),
+    getDoctorById: builder.query<DoctorApiResponse, string>({
+      query: (id) => ({
+        url: `/admin/doctor/${id}`,
+        method: "GET",
+      }),
+    }),
+    updateDoctorById: builder.mutation<Doctor, { id: string; status: string }>({
+      query: ({ id, status }) => ({
+        url: `/admin/doctor/${id}`,
+        method: "PUT",
+        body: { status },
+      }),
+    }),
+
     getAvailableDoctorsByTime: builder.mutation({
       query: (body) => ({
         url: "/admin/doctors",
@@ -56,4 +72,6 @@ export const {
   useGetAdminAppointmentsQuery,
   useGetAvailableDoctorsByTimeMutation,
   useAssignMeetingLinkMutation,
+  useGetDoctorByIdQuery,
+  useUpdateDoctorByIdMutation,
 } = adminApi;

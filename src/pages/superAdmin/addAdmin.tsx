@@ -85,6 +85,7 @@ const AddAdmin = () => {
               rules={[{ required: true, message: "Phone number is required" }]}
             >
               <PhoneInput
+                disableDropdown
                 country="ie"
                 inputStyle={{ width: "100%" }}
                 value={form.getFieldValue("phone")}

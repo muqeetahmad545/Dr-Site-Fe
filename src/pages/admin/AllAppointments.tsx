@@ -88,14 +88,14 @@ const AllAppointments: React.FC = () => {
   const openAssignModal = async (record: any) => {
     setAssigningAppointment(null); // reset modal state first
 
-    const date = new Date(record.appointment_date);
-    const day = date
-      .toLocaleDateString("en-US", { weekday: "long" })
-      .toLowerCase();
+    // const date = new Date(record.appointment_date);
+    // const day = date
+    //   .toLocaleDateString("en-US", { weekday: "long" })
+    //   .toLowerCase();
 
     try {
       const response = await getDoctors({
-        day,
+        date: record.appointment_date,
         time: record.appointment_time,
       }).unwrap();
 

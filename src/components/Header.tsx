@@ -12,7 +12,7 @@ interface HeaderProps {
   title?: string;
 }
 
-export const Header: React.FC<HeaderProps> = ({ title = "Dr Site" }) => {
+export const Header: React.FC<HeaderProps> = ({ title = "Clinvia" }) => {
   const navigate = useNavigate();
 
   const { data: profile, isLoading, isError, refetch } = userProfile();

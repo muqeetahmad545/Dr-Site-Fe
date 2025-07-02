@@ -22,6 +22,7 @@ import {
   SECRET_KEY,
   type EncryptedResult,
 } from "../../helper/Crypto";
+import PhoneInput from "react-phone-input-2";
 
 const AdminSetting: React.FC = () => {
   const { Option } = Select;
@@ -192,11 +193,19 @@ const AdminSetting: React.FC = () => {
           </Col>
           <Col span={12}>
             <Form.Item
-              label="Phone Number"
               name="phone"
-              rules={[{ required: true }]}
+              label="Phone Number"
+              rules={[
+                { required: true, message: "Please enter your phone number" },
+              ]}
             >
-              <Input />
+              <PhoneInput
+                country="ie"
+                disableDropdown
+                value={form.getFieldValue("phone")}
+                onChange={(phone) => form.setFieldsValue({ phone })}
+                inputStyle={{ width: "100%" }}
+              />
             </Form.Item>
           </Col>
         </Row>

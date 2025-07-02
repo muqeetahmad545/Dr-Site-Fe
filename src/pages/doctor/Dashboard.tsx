@@ -232,7 +232,7 @@ const DoctorDashboard = () => {
             <List
               itemLayout="horizontal"
               dataSource={upcomingAppointments.slice(0, 3)}
-              renderItem={(item) => (
+              renderItem={(item: any) => (
                 <List.Item>
                   <List.Item.Meta
                     avatar={

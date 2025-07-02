@@ -1,9 +1,14 @@
 import type { Appointment } from "./appointment";
 
+export interface EncryptedResult {
+  data: string;
+  iv: string;
+}
 export interface Doctor {
   id: string;
   first_name?: string;
   last_name?: string;
+  profile_image?: EncryptedResult | string;
   email: string;
   phone?: string;
   password?: string;
@@ -21,11 +26,22 @@ export interface Doctor {
     available_days: string | null;
     doctor_availabilities: string | null;
     available_times: string | null;
+    imc?: string | null;
+    appointments?: Appointment[];
   };
+}
+
+export interface DoctorApiResponse {
+  status?: string;
+  data?: Doctor;
 }
 
 export interface GetAppointmentsResponse {
   data: Appointment[];
+  message: String;
+}
+export interface GetAppointmentsResponseByID {
+  data: Appointment;
   message: String;
 }
 export interface SickLeaveRequest {
@@ -33,9 +49,11 @@ export interface SickLeaveRequest {
   startDate: string;
   endDate: string;
   reason: string;
+  age: string;
 }
 export interface Medication {
   name?: string;
+  drug_name?: string;
   dosage?: string;
   frequency?: string;
   duration?: string;
@@ -46,6 +64,7 @@ export interface Prescription {
   appointmentId?: number;
   notes?: string;
   pharmacy?: string;
+  age?: string;
   testsRecommended?: string[];
   medications?: Medication[];
 }

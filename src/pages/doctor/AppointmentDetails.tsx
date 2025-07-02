@@ -1,5 +1,9 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
+import {
+  PlusOutlined,
+  MinusCircleOutlined,
+  EyeOutlined,
+} from "@ant-design/icons";
 
 import {
   Descriptions,
@@ -13,20 +17,24 @@ import {
   Space,
   Row,
   Col,
+  Table,
 } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PrimaryButton } from "../../components/PrimaryButton";
 import {
   useGenerateSickLeaveMutation,
   useGeneratePrescriptionMutation,
 } from "../../features/api/doctor/doctorApi";
-import type { Prescription } from "../../types";
+import type { Medication, Prescription, SickLeaveRequest } from "../../types";
 import type { Dayjs } from "dayjs";
+import { useParams } from "react-router-dom";
+import { useGetAppointmentByIdQuery } from "../../features/api/doctor/doctorApi";
+import jsPDF from "jspdf";
 
 const AppointmentDetails = () => {
   const [sickLeaveForm] = Form.useForm();
   const [prescriptionForm] = Form.useForm();
-
+  const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const patient = location.state?.patient;
@@ -46,6 +54,13 @@ const AppointmentDetails = () => {
   const [generateSickLeave, { isLoading }] = useGenerateSickLeaveMutation();
   const [generatePrescription, { isLoading: isPrescriptionLoading }] =
     useGeneratePrescriptionMutation();
+  const { data, error, refetch } = useGetAppointmentByIdQuery(id!);
+  const appointment = data?.data;
+  useEffect(() => {
+    if (id) {
+      refetch();
+    }
+  }, [id]);
 
   // Disable dates in endDate before or equal to startDate
   const disabledEndDate = (current: any) => {
@@ -64,6 +79,7 @@ const AppointmentDetails = () => {
       const values = await sickLeaveForm.validateFields();
       const res = await generateSickLeave({
         appointmentId: patient.id,
+        age: patient.age,
         startDate: values.startDate.format("YYYY-MM-DD"),
         endDate: values.endDate.format("YYYY-MM-DD"),
         reason: values.reason,
@@ -89,6 +105,7 @@ const AppointmentDetails = () => {
       const payload: Prescription = {
         appointmentId: patient.id,
         notes: values.notes,
+        age: patient.age,
         // pharmacy: patient.pharmacy, // from your patient data
         testsRecommended: tests.filter((t) => t.trim() !== ""),
         medications,
@@ -114,6 +131,202 @@ const AppointmentDetails = () => {
       }
     }
   };
+
+  if (error || !appointment) return <div>Failed to load appointment.</div>;
+
+  const generatePrescriptionPdfPreview = () => {
+    if (!appointment || appointment.prescribed_Medicines?.length === 0) {
+      message.warning("No prescription data available.");
+      return;
+    }
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    const title = "Prescription Details";
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const textWidth = doc.getTextWidth(title);
+    const x = (pageWidth - textWidth) / 2;
+    doc.setFontSize(16);
+    doc.text(title, x, 20);
+    doc.setFontSize(12);
+    let y = 30;
+
+    const { patient } = appointment;
+
+    doc.text(
+      `Patient Name: ${patient?.user?.first_name || ""} ${
+        patient?.user?.last_name || ""
+      }`,
+      14,
+      y
+    );
+    y += 8;
+    doc.text(`Email: ${patient?.user?.email}`, 14, y);
+    y += 8;
+    doc.text(`Phone: ${patient?.user?.phone}`, 14, y);
+    y += 8;
+    doc.text(`Appointment Date: ${appointment.appointment_date}`, 14, y);
+    y += 8;
+
+    doc.setFontSize(14);
+    doc.text("Doctor's Notes", 14, y);
+    y += 8;
+    doc.setFontSize(12);
+    doc.text(appointment.notes || "N/A", 14, y);
+    y += 12;
+
+    appointment.prescribed_Medicines?.forEach((med, index) => {
+      doc.text(`${index + 1}. Drug: ${med.drug_name}`, 14, y);
+      y += 6;
+      doc.text(`   Dosage: ${med.dosage}`, 14, y);
+      y += 6;
+      doc.text(`   Frequency: ${med.frequency}`, 14, y);
+      y += 6;
+      doc.text(`   Duration: ${med.duration}`, 14, y);
+      y += 6;
+      doc.text(`   Instructions: ${med.instructions}`, 14, y);
+      y += 10;
+    });
+
+    const pdfBlob = doc.output("blob");
+    const blobUrl = URL.createObjectURL(pdfBlob);
+    window.open(blobUrl, "_blank");
+  };
+  const generateSickLeavePdfPreview = () => {
+    if (!appointment || !appointment.sickLeaves) {
+      message.warning("No sick leave data available.");
+      return;
+    }
+
+    const sickLeaves = Array.isArray(appointment.sickLeaves)
+      ? appointment.sickLeaves
+      : [appointment.sickLeaves]; // wrap single object as array
+
+    if (sickLeaves.length === 0) {
+      message.warning("No sick leave data available.");
+      return;
+    }
+
+    const doc = new jsPDF();
+
+    doc.setFontSize(16);
+    const title = "Sick Leave Details";
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const textWidth = doc.getTextWidth(title);
+    const x = (pageWidth - textWidth) / 2;
+    doc.text(title, x, 20);
+
+    doc.setFontSize(12);
+    let y = 30;
+
+    const { patient } = appointment;
+
+    doc.text(
+      `Patient Name: ${patient?.user?.first_name || ""} ${
+        patient?.user?.last_name || ""
+      }`,
+      14,
+      y
+    );
+    y += 8;
+    doc.text(`Email: ${patient?.user?.email || "N/A"}`, 14, y);
+    y += 8;
+    doc.text(`Phone: ${patient?.user?.phone || "N/A"}`, 14, y);
+    y += 8;
+    doc.text(
+      `Appointment Date: ${appointment.appointment_date || "N/A"}`,
+      14,
+      y
+    );
+    y += 12;
+
+    sickLeaves.forEach((leave, index) => {
+      doc.text(
+        `${index + 1}. From: ${leave.startDate} To: ${leave.endDate}`,
+        14,
+        y
+      );
+      y += 6;
+      doc.text(`   Reason: ${leave.reason}`, 14, y);
+      y += 6;
+      doc.text(`   Age: ${leave.age}`, 14, y);
+      y += 10;
+    });
+
+    const pdfBlob = doc.output("blob");
+    const blobUrl = URL.createObjectURL(pdfBlob);
+    window.open(blobUrl, "_blank");
+  };
+
+  const prescriptionColumns = [
+    {
+      title: "Drug Name",
+      dataIndex: "drug_name",
+      key: "drug_name",
+    },
+    {
+      title: "Dosage",
+      dataIndex: "dosage",
+      key: "dosage",
+    },
+    {
+      title: "Frequency",
+      dataIndex: "frequency",
+      key: "frequency",
+    },
+    {
+      title: "Duration",
+      dataIndex: "duration",
+      key: "duration",
+    },
+    {
+      title: "Instructions",
+      dataIndex: "instructions",
+      key: "instructions",
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: () => (
+        <EyeOutlined
+          style={{ fontSize: 18, color: "#1890ff", cursor: "pointer" }}
+          onClick={generatePrescriptionPdfPreview}
+        />
+      ),
+    },
+  ];
+
+  const sickLeaveColumns = [
+    {
+      title: "Start Date",
+      dataIndex: "startDate",
+      key: "startDate",
+    },
+    {
+      title: "End Date",
+      dataIndex: "endDate",
+      key: "endDate",
+    },
+    {
+      title: "Reason",
+      dataIndex: "reason",
+      key: "reason",
+    },
+    {
+      title: "Age",
+      dataIndex: "age",
+      key: "age",
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: () => (
+        <EyeOutlined
+          style={{ fontSize: 18, color: "#1890ff", cursor: "pointer" }}
+          onClick={generateSickLeavePdfPreview}
+        />
+      ),
+    },
+  ];
 
   return (
     <Card
@@ -164,6 +377,9 @@ const AppointmentDetails = () => {
         <Form form={sickLeaveForm} layout="vertical">
           <Form.Item label="Email">
             <Input value={patient.email} disabled />
+          </Form.Item>
+          <Form.Item label="Email">
+            <Input value={patient.age} disabled />
           </Form.Item>
           <Form.Item
             name="startDate"
@@ -389,7 +605,7 @@ const AppointmentDetails = () => {
             <Input.TextArea rows={3} />
           </Form.Item>
 
-          <Form.Item label="Tests Recommended">
+          {/* <Form.Item label="Tests Recommended">
             {tests.map((test, index) => (
               <Row
                 gutter={12}
@@ -427,9 +643,57 @@ const AppointmentDetails = () => {
             >
               Add Test
             </PrimaryButton>
-          </Form.Item>
+          </Form.Item> */}
         </Form>
       </Modal>
+      {/* Sick Leave Card */}
+      <Card title="" style={{ marginTop: 24 }}>
+        <Descriptions bordered column={1} labelStyle={{ fontWeight: "bold" }}>
+          <Descriptions.Item label="Doctor Notes">
+            {appointment.notes}
+          </Descriptions.Item>
+        </Descriptions>
+        <Card title="Prescription Details" style={{ marginTop: 24 }}>
+          <Table
+            dataSource={
+              Array.isArray(appointment?.prescribed_Medicines)
+                ? appointment.prescribed_Medicines.map(
+                    (med: Medication, index: number) => ({
+                      key: index,
+                      drug_name: med.drug_name,
+                      dosage: med.dosage,
+                      frequency: med.frequency,
+                      duration: med.duration,
+                      instructions: med.instructions,
+                    })
+                  )
+                : []
+            }
+            columns={prescriptionColumns}
+            pagination={false}
+          />
+        </Card>
+      </Card>
+
+      <Card title="Sick Leave Details" style={{ marginTop: 24 }}>
+        <Table
+          dataSource={
+            Array.isArray(appointment?.sickLeaves)
+              ? appointment.sickLeaves.map(
+                  (leave: SickLeaveRequest, index: number) => ({
+                    key: index,
+                    startDate: leave.startDate,
+                    endDate: leave.endDate,
+                    reason: leave.reason,
+                    age: leave.age,
+                  })
+                )
+              : []
+          }
+          columns={sickLeaveColumns}
+          pagination={false}
+        />
+      </Card>
     </Card>
   );
 };

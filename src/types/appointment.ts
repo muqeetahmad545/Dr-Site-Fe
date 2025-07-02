@@ -1,3 +1,4 @@
+import type { Doctor, Medication, SickLeaveRequest } from "./doctor";
 import type { Patient } from "./patient";
 
 export interface Appointment {
@@ -12,9 +13,12 @@ export interface Appointment {
   age?: number;
   appointment_date?: string | any;
   appointment_time?: string;
-  note?: string;
+  notes?: string;
   symptoms?: string;
   consultingDoctor?: string;
   status?: boolean | string;
-  patient: Patient;
+  patient?: Patient;
+  doctor?: Doctor;
+  prescribed_Medicines?: Medication[];
+  sickLeaves?: SickLeaveRequest[] | SickLeaveRequest;
 }

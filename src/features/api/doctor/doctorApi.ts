@@ -2,6 +2,7 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQuery } from "../../../util/baseApi";
 import type {
   GetAppointmentsResponse,
+  GetAppointmentsResponseByID,
   Prescription,
   Response,
   SickLeaveRequest,
@@ -31,6 +32,12 @@ export const doctorApi = createApi({
         body,
       }),
     }),
+    getAppointmentById: builder.query<GetAppointmentsResponseByID, string>({
+      query: (id) => ({
+        url: `/doctor/appointment/${id}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -38,4 +45,5 @@ export const {
   useGetAppointmentsDoctorQuery,
   useGenerateSickLeaveMutation,
   useGeneratePrescriptionMutation,
+  useGetAppointmentByIdQuery,
 } = doctorApi;

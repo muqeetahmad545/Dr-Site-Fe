@@ -185,6 +185,7 @@ const PersonalInfo: React.FC<ProfileSetupProps> = ({
             rules={[{ required: true }]}
           >
             <PhoneInput
+              disableDropdown
               country="ie"
               // Use form.getFieldValue to set value to keep in sync
               value={form.getFieldValue("phone")}

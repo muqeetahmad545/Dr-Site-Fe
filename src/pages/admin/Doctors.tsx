@@ -1,28 +1,30 @@
 import React, { useEffect, useState } from "react";
-import { Table, Tag, Card } from "antd";
-// import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
-// import { PrimaryButton } from "../../components/PrimaryButton";
+import { Table, Tag, Card, Modal, Select, message } from "antd";
+import { EyeOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { useGetDoctorsQuery } from "../../features/api/admin/adminApi";
+import {
+  useGetDoctorsQuery,
+  useUpdateDoctorByIdMutation,
+} from "../../features/api/admin/adminApi";
 import type { Doctor } from "../../types/doctor";
 import LoadingSpinner from "../../components/LoadingSpinner";
-// import { userProfile } from "../../hooks/userProfile";
+
+const { Option } = Select;
 
 const AllDoctors: React.FC = () => {
   const navigate = useNavigate();
-  // const { data: profile, refetch } = userProfile();
+
   const { data: doctorsData, refetch, isLoading } = useGetDoctorsQuery();
+  const [updateDoctorStatus] = useUpdateDoctorByIdMutation();
+
   const [doctorList, setDoctorList] = useState<Doctor[]>([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
+  const [status, setStatus] = useState<string>("");
+
   useEffect(() => {
     refetch();
   }, [refetch]);
-  // const isProfileComplete = (profile: any) => {
-  //   return (
-  //     profile?.data.first_name &&
-  //     profile?.data.email &&
-  //     profile?.data.status === "active"
-  //   );
-  // };
 
   useEffect(() => {
     if (doctorsData && doctorsData.data) {
@@ -30,40 +32,24 @@ const AllDoctors: React.FC = () => {
     }
   }, [doctorsData]);
 
-  // const handleDelete = (id: any) => {
-  //   if (!isProfileComplete(profile)) {
-  //     message.warning(
-  //       "To proceed, please complete your profile information in settings."
-  //     );
-  //     navigate("/admin/settings");
-  //     return;
-  //   }
-  //   const updatedList = doctorList.filter((doc) => doc.id !== id);
-  //   setDoctorList(updatedList);
-  //   message.success("Doctor deleted successfully!");
-  // };
+  const showStatusModal = (doctor: Doctor) => {
+    setSelectedDoctor(doctor);
+    setStatus(doctor.status ?? "");
+    setIsModalVisible(true);
+  };
 
-  // const handleAddDoctor = () => {
-  //   if (!isProfileComplete(profile)) {
-  //     message.warning(
-  //       "To proceed, please complete your profile information in settings."
-  //     );
-  //     navigate("/admin/settings");
-  //     return;
-  //   }
-  //   navigate("/admin/add-doctor");
-  // };
+  const handleStatusChange = async () => {
+    if (!selectedDoctor) return;
 
-  // const handelEditPatient = (id: any) => {
-  //   if (!isProfileComplete(profile)) {
-  //     message.warning(
-  //       "To proceed, please complete your profile information in settings."
-  //     );
-  //     navigate("/admin/settings");
-  //     return;
-  //   }
-  //   navigate(`/admin/edit-doctor/${id}`);
-  // };
+    try {
+      await updateDoctorStatus({ id: selectedDoctor.id, status }).unwrap();
+      message.success("Doctor status updated!");
+      setIsModalVisible(false);
+      refetch();
+    } catch (error) {
+      message.error("Failed to update doctor status.");
+    }
+  };
 
   const columns = [
     {
@@ -87,52 +73,69 @@ const AllDoctors: React.FC = () => {
     {
       title: "Status",
       dataIndex: "status",
-      render: (active: boolean) =>
-        active ? (
-          <Tag color="green">Active</Tag>
-        ) : (
-          <Tag color="red">Inactive</Tag>
-        ),
+      render: (_: any, record: Doctor) => (
+        <Tag
+          color={record.status === "active" ? "green" : "red"}
+          style={{ cursor: "pointer" }}
+          onClick={() => showStatusModal(record)}
+        >
+          {record.status === "active" ? "Active" : "Inactive"}
+        </Tag>
+      ),
     },
-    // {
-    //   title: "Actions",
-    //   render: (_: any, record: any) => (
-    //     <>
-    //       <EditOutlined
-    //         onClick={() => handelEditPatient(record.id)}
-    //         style={{ marginRight: 16, color: "#1890ff", cursor: "pointer" }}
-    //       />
-    //       <DeleteOutlined
-    //         onClick={() => handleDelete(record.id)}
-    //         style={{ color: "#ff4d4f", cursor: "pointer" }}
-    //       />
-    //     </>
-    //   ),
-    // },
+    {
+      title: "Actions",
+      render: (_: any, record: Doctor) => (
+        <EyeOutlined
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate(`/admin/doctor/${record.id}`);
+          }}
+          style={{ color: "#1890ff", fontSize: 18, cursor: "pointer" }}
+        />
+      ),
+    },
   ];
+
   if (isLoading) {
     return <LoadingSpinner />;
   }
+
   return (
-    <Card
-      className="titel-button"
-      title={
-        <div className="header-row">
-          <span>Doctors</span>
-          {/* <PrimaryButton onClick={handleAddDoctor}>Add Doctor</PrimaryButton> */}
-        </div>
-      }
-    >
-      <Table
-        dataSource={doctorList}
-        columns={columns}
-        rowKey="id"
-        loading={isLoading}
-        onRow={(record) => ({
-          onClick: () => navigate(`/admin/doctor/${record.id}`),
-        })}
-      />
-    </Card>
+    <>
+      <Card
+        className="titel-button"
+        title={
+          <div className="header-row">
+            <span>Doctors</span>
+          </div>
+        }
+      >
+        <Table
+          dataSource={doctorList}
+          columns={columns}
+          rowKey="id"
+          loading={isLoading}
+        />
+      </Card>
+
+      <Modal
+        title="Update Doctor Status"
+        open={isModalVisible}
+        onOk={handleStatusChange}
+        onCancel={() => setIsModalVisible(false)}
+        okText="Update"
+      >
+        <Select
+          value={status}
+          onChange={(value) => setStatus(value)}
+          style={{ width: "100%" }}
+        >
+          <Option value="active">Active</Option>
+          <Option value="inactive">Inactive</Option>
+        </Select>
+      </Modal>
+    </>
   );
 };
 
